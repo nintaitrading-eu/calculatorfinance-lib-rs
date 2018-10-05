@@ -5,4 +5,5 @@ authors = ["Andy Nagels <thereisanewway@gmail.com>"]
 
 [lib]
 name = "libcalculatorfinance"
+path = "src/lib.rs"
 crate-type = ["dylib"]
