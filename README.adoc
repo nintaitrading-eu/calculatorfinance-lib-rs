@@ -8,8 +8,8 @@ Shared library for financial calculations w.r.t. trading and investing.
 
 |==============================
 | branch | build status
-| libcalculatorfinance-rs-develop | image:https://travis-ci.org/nintaitrading-eu/libcalculatorfinance-rs.svg?branch=libcalculatorfinance-rs-develop["Build Status", link="https://travis-ci.org/nintaitrading-eu/libcalculatorfinance-rs"]
-| libcalculatorfinance-rs-release | image:https://travis-ci.org/nintaitrading-eu/libcalculatorfinance-rs.svg?branch=libcalculatorfinance-rs-release["Build Status", link="https://travis-ci.org/nintaitrading-eu/libcalculatorfinance-rs"]
+| libcalculatorfinance-rs-develop | image:https://travis-ci.com/nintaitrading-eu/libcalculatorfinance-rs.svg?branch=libcalculatorfinance-rs-develop["Build Status", link="https://travis-ci.com/nintaitrading-eu/libcalculatorfinance-rs"]
+| libcalculatorfinance-rs-release | image:https://travis-ci.com/nintaitrading-eu/libcalculatorfinance-rs.svg?branch=libcalculatorfinance-rs-release["Build Status", link="https://travis-ci.com/nintaitrading-eu/libcalculatorfinance-rs"]
 |==============================
 
 == Release
