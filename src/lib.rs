@@ -78,7 +78,7 @@ pub fn calculate_shares_recommended(a_pool: f64, a_commission: f64, a_tax: f64, 
        // Note: The int typecast performs truncation. It's better to buy a contract less, than
        // to buy a contract too much. So this truncation provides extra safety and is
        // indeed what we want.
-       (int)((a_pool - (a_tax / 100.0 * a_pool) - a_commission) / a_price)
+       ((a_pool - (a_tax / 100.0 * a_pool) - a_commission) / a_price).floor()
 }
 
 /**********************************************************************
@@ -110,12 +110,12 @@ pub fn calculate_stoploss(a_price: f64, a_shares: i32, a_tax: f64, a_commission:
     let mut l_denominator = 0.0;
     if a_is_long
     {
-        l_numerator = a_shares * a_price * (1.0 + a_tax / 100.0) - a_risk / 100.0 * a_pool + 2.0 * a_commission;
-        l_denominator = a_shares * 1.0 - a_tax / 100.0;
+        l_numerator = (a_shares as f64) * a_price * (1.0 + a_tax / 100.0) - a_risk / 100.0 * a_pool + 2.0 * a_commission;
+        l_denominator = (a_shares as f64) * 1.0 - a_tax / 100.0;
     }
     else
     {
-        l_numerator = a_risk / 100.0 * a_pool + a_shares * a_price * (1.0 - a_tax / 100.0) - 2.0 * a_commission;
+        l_numerator = a_risk / 100.0 * a_pool + (a_shares as f64) * a_price * (1.0 - a_tax / 100.0) - 2.0 * a_commission;
         l_denominator = a_shares * 1.0 + a_tax / 100.0;
     }
     l_numerator / l_denominator
@@ -145,7 +145,7 @@ pub fn calculate_risk_input(a_pool: f64, a_risk: f64) -> f64
  * -----
  * S.Ps + S.Psl.T + C - (S.Ps - S.Ps.T - C)
  **********************************************************************/
-pub fn calculate_risk_initial(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_stoploss: f64, a_is_long: i32) -> F64
+pub fn calculate_risk_initial(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_stoploss: f64, a_is_long: i32) -> f64
 {
     let mut result = 0.0;
     if a_is_long
@@ -163,9 +163,9 @@ pub fn calculate_risk_initial(a_price: f64, a_shares: i32, a_tax: f64, a_commiss
  * calculate_amount:
  * Calculates the amount without tax and commission.
  **********************************************************************/
-pub fn calculate_amount(double a_price, int a_shares) -> f64
+pub fn calculate_amount(a_price: f64, a_shares: i32) -> f64
 {
-    a_price * a_shares
+    a_price * (a_shares as f64)
 }
 
 /**********************************************************************
