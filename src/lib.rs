@@ -52,20 +52,20 @@ pub fn calculate_percentage_of(a_value: f64, a_from_value: f64) -> f64
  * Returns a price, with an exchange rate applied to it.
  * Used to convert a given currency to a new currency.
  **********************************************************************/
-/*double convert_from_orig(double a_price, double a_exchange_rate)
+pub fn convert_from_orig(a_price: f64, a_exchange_rate: f64) -> f64
 {
-    return a_price * a_exchange_rate;
-}*/
+    a_price * a_exchange_rate
+}
 
 /**********************************************************************
  * convert_to_orig:
  * Returns a price in the original currency, with the
  * exchange rate no longer applied to it.
  **********************************************************************/
-/*double convert_to_orig(double a_converted_price, double a_exchange_rate)
+pub fn convert_to_orig(a_converted_price: f64, a_exchange_rate: f64) -> f64
 {
-    return a_converted_price / a_exchange_rate;
-}*/
+    a_converted_price / a_exchange_rate
+}
 
 // Before trade
 
@@ -73,13 +73,13 @@ pub fn calculate_percentage_of(a_value: f64, a_from_value: f64) -> f64
  * calculate_shares_recommended:
  * Calculates the recommended amount of shares you can buy.
  **********************************************************************/
-/*int calculate_shares_recommended(double a_pool, double a_commission, double a_tax, double a_price)
+pub fn calculate_shares_recommended(a_pool: f64, a_commission: f64, a_tax: f64, a_price: f64) -> i32
 {
        // Note: The int typecast performs truncation. It's better to buy a contract less, than
        // to buy a contract too much. So this truncation provides extra safety and is
        // indeed what we want.
-       return (int)((a_pool - (a_tax / 100.0 * a_pool) - a_commission) / a_price);
-}*/
+       (int)((a_pool - (a_tax / 100.0 * a_pool) - a_commission) / a_price)
+}
 
 /**********************************************************************
  * calculate_leveraged_contracts:
