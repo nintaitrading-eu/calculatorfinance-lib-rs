@@ -116,7 +116,7 @@ pub fn calculate_stoploss(a_price: f64, a_shares: i32, a_tax: f64, a_commission:
     else
     {
         l_numerator = a_risk / 100.0 * a_pool + (a_shares as f64) * a_price * (1.0 - a_tax / 100.0) - 2.0 * a_commission;
-        l_denominator = a_shares * 1.0 + a_tax / 100.0;
+        l_denominator = (a_shares as f64) * 1.0 + a_tax / 100.0;
     }
     l_numerator / l_denominator
 }
@@ -145,16 +145,16 @@ pub fn calculate_risk_input(a_pool: f64, a_risk: f64) -> f64
  * -----
  * S.Ps + S.Psl.T + C - (S.Ps - S.Ps.T - C)
  **********************************************************************/
-pub fn calculate_risk_initial(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_stoploss: f64, a_is_long: i32) -> f64
+pub fn calculate_risk_initial(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_stoploss: f64, a_is_long: bool) -> f64
 {
     let mut result = 0.0;
     if a_is_long
     {
-        result = a_shares * a_price * (1.0 + a_tax / 100.0) - a_shares * a_stoploss * (1.0 - a_tax / 100.0) + 2.0 * a_commission;
+        result = (a_shares as f64) * a_price * (1.0 + a_tax / 100.0) - (a_shares as f64) * a_stoploss * (1.0 - a_tax / 100.0) + 2.0 * a_commission;
     }
     else
     {
-        result = a_shares * a_stoploss * (1.0 + a_tax / 100.0) - a_shares * a_price * (1.0 - a_tax / 100.0) + 2.0 * a_commission;
+        result = (a_shares as f64) * a_stoploss * (1.0 + a_tax / 100.0) - (a_shares as f64) * a_price * (1.0 - a_tax / 100.0) + 2.0 * a_commission;
     }
     result
 }
