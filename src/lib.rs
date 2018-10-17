@@ -78,7 +78,7 @@ pub fn calculate_shares_recommended(a_pool: f64, a_commission: f64, a_tax: f64, 
        // Note: The int typecast performs truncation. It's better to buy a contract less, than
        // to buy a contract too much. So this truncation provides extra safety and is
        // indeed what we want.
-       ((a_pool - (a_tax / 100.0 * a_pool) - a_commission) / a_price).floor()
+       (((a_pool - (a_tax / 100.0 * a_pool) - a_commission) / a_price) as i32)
 }
 
 /**********************************************************************
@@ -88,7 +88,7 @@ pub fn calculate_shares_recommended(a_pool: f64, a_commission: f64, a_tax: f64, 
  **********************************************************************/
 pub fn calculate_leveraged_contracts(a_n: i32) -> i32
 {
-    (a_n / 3.0).ceil() - 1 + a_n
+    (((a_n as f64) / 3.0).ceil() as i32) - 1 + a_n
 }
 
 /**********************************************************************
