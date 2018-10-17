@@ -204,10 +204,10 @@ pub fn calculate_amount(a_price: f64, a_shares: i32) -> f64
  * cost_transaction:
  * Cost of transaction (tax and commission)
  **********************************************************************/
-/*double cost_transaction(double a_price, int a_shares, double a_tax, double a_commission)
+pub fn cost_transaction(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64) -> f64
 {
-    return a_price * a_shares * a_tax / 100.0 + a_commission;
-}*/
+    a_price * (a_shares as f64) * a_tax / 100.0 + a_commission
+}
 
 /**********************************************************************
  * cost_tax:
