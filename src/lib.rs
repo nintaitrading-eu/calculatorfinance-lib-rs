@@ -86,10 +86,10 @@ pub fn calculate_shares_recommended(a_pool: f64, a_commission: f64, a_tax: f64, 
  * Calculates the number of contracts to buy, according to an algorithm
  * that determines an ideal amount of leverage.
  **********************************************************************/
-/*int calculate_leveraged_contracts(int a_n)
+pub fn calculate_leveraged_contracts(a_n: i32) -> i32
 {
-    return ceil(a_n / 3.0) - 1 + a_n;
-}*/
+    (a_n / 3.0).ceil() - 1 + a_n
+}
 
 /**********************************************************************
  * calculate_stoploss:
@@ -104,11 +104,11 @@ pub fn calculate_shares_recommended(a_pool: f64, a_commission: f64, a_tax: f64, 
  * amount selling - amount buying at stoploss = initial risk of pool
  * (S.Psl + S.Psl.T + C) - (S.Ps - S.Ps.T - C) = R/100 * pool
  **********************************************************************/
-/*double calculate_stoploss(double a_price, int a_shares, double a_tax, double a_commission, double a_risk, double a_pool, int a_is_long)
+pub fn calculate_stoploss(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_risk: f64, a_pool: f64, a_is_long: bool) -> f64
 {
-    double l_numerator = 0.0;
-    double l_denominator = 0.0;
-    if (a_is_long == 1)
+    let mut l_numerator = 0.0;
+    let mut l_denominator = 0.0;
+    if a_is_long
     {
         l_numerator = a_shares * a_price * (1.0 + a_tax / 100.0) - a_risk / 100.0 * a_pool + 2.0 * a_commission;
         l_denominator = a_shares * 1.0 - a_tax / 100.0;
@@ -118,18 +118,18 @@ pub fn calculate_shares_recommended(a_pool: f64, a_commission: f64, a_tax: f64, 
         l_numerator = a_risk / 100.0 * a_pool + a_shares * a_price * (1.0 - a_tax / 100.0) - 2.0 * a_commission;
         l_denominator = a_shares * 1.0 + a_tax / 100.0;
     }
-    return l_numerator / l_denominator;
-}*/
+    l_numerator / l_denominator
+}
 
 /**********************************************************************
  * calculate_risk_input:
  * Calculates the risk based on total pool and input.
  * Consider this the theoretical risk we want to take.
  **********************************************************************/
-/*double calculate_risk_input(double a_pool, double a_risk)
+pub fn calculate_risk_input(a_pool: f64, a_risk: f64) -> f64
 {
-    return a_risk / 100.0 * a_pool;
-}*/
+    a_risk / 100.0 * a_pool
+}
 
 /**********************************************************************
  * calcculate_risk_initial:
@@ -145,22 +145,28 @@ pub fn calculate_shares_recommended(a_pool: f64, a_commission: f64, a_tax: f64, 
  * -----
  * S.Ps + S.Psl.T + C - (S.Ps - S.Ps.T - C)
  **********************************************************************/
-/*double calculate_risk_initial(double a_price, int a_shares, double a_tax, double a_commission, double a_stoploss, int a_is_long)
+pub fn calculate_risk_initial(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_stoploss: f64, a_is_long: i32) -> F64
 {
-    if (a_is_long)
-        return a_shares * a_price * (1.0 + a_tax / 100.0) - a_shares * a_stoploss * (1.0 - a_tax / 100.0) + 2.0 * a_commission;
+    let mut result = 0.0;
+    if a_is_long
+    {
+        result = a_shares * a_price * (1.0 + a_tax / 100.0) - a_shares * a_stoploss * (1.0 - a_tax / 100.0) + 2.0 * a_commission;
+    }
     else
-        return a_shares * a_stoploss * (1.0 + a_tax / 100.0) - a_shares * a_price * (1.0 - a_tax / 100.0) + 2.0 * a_commission;
-}*/
+    {
+        result = a_shares * a_stoploss * (1.0 + a_tax / 100.0) - a_shares * a_price * (1.0 - a_tax / 100.0) + 2.0 * a_commission;
+    }
+    result
+}
 
 /**********************************************************************
  * calculate_amount:
  * Calculates the amount without tax and commission.
  **********************************************************************/
-/*double calculate_amount(double a_price, int a_shares)
+pub fn calculate_amount(double a_price, int a_shares) -> f64
 {
-    return a_price * a_shares;
-}*/
+    a_price * a_shares
+}
 
 /**********************************************************************
  * calculate_amount_with_tax_and_commission:
