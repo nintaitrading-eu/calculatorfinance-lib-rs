@@ -106,8 +106,8 @@ pub fn calculate_leveraged_contracts(a_n: i32) -> i32
  **********************************************************************/
 pub fn calculate_stoploss(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_risk: f64, a_pool: f64, a_is_long: bool) -> f64
 {
-    let mut l_numerator = 0.0;
-    let mut l_denominator = 0.0;
+    let l_numerator;
+    let l_denominator;
     if a_is_long
     {
         l_numerator = (a_shares as f64) * a_price * (1.0 + a_tax / 100.0) - a_risk / 100.0 * a_pool + 2.0 * a_commission;
@@ -147,7 +147,7 @@ pub fn calculate_risk_input(a_pool: f64, a_risk: f64) -> f64
  **********************************************************************/
 pub fn calculate_risk_initial(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_stoploss: f64, a_is_long: bool) -> f64
 {
-    let mut result = 0.0;
+    let result;
     if a_is_long
     {
         result = (a_shares as f64) * a_price * (1.0 + a_tax / 100.0) - (a_shares as f64) * a_stoploss * (1.0 - a_tax / 100.0) + 2.0 * a_commission;
