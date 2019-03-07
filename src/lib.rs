@@ -1,5 +1,12 @@
 /* See LICENSE.txt file for license and copyright information. */
 
+#[derive(Debug, PartialEq)]
+pub enum TransactionType
+{
+    Buy,
+    Sell
+}
+
 /**********************************************************************
  * calculate_average_price:
  * Calculate the average price, based on previous transactions.
@@ -176,13 +183,20 @@ pub fn calculate_amount(a_price: f64, a_shares: i32) -> f64
  * AMT = SP + SPT + C (buy)
  * AMT = SP - SPT - C (sell)
  **********************************************************************/
-/*double calculate_amount_with_tax_and_commission(double a_price, int a_shares, double a_tax, double a_commission, transaction_type_t a_transaction_type)
+// TODO: How to create the transaction-type enum?
+pub fn calculate_amount_with_tax_and_commission(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_transaction_type: TransactionType) -> f64
 {
-    if (a_transaction_type == BUY)
-        return a_shares * a_price + a_shares * a_price * a_tax + a_commission;
+    let result;
+    if a_transaction_type == TransactionType::Buy
+    {
+        result = (a_shares as f64) * a_price + (a_shares as f64) * a_price * a_tax + a_commission;
+    }
     else
-        return a_shares * a_price - a_shares * a_price * a_tax - a_commission;
-}*/
+    {
+        result = (a_shares as f64) * a_price - (a_shares as f64) * a_price * a_tax - a_commission;
+    }
+    result
+}
 
 /**********************************************************************
  * calculate_amount_with_tax:
