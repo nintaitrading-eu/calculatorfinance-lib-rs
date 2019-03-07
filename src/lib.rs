@@ -292,11 +292,10 @@ pub fn cost_transaction(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f
  * calculate_cost_total:
  * Function to calculate the total cost associated with the given trade.
  **********************************************************************/
-/*double calculate_cost_total(double a_amount_buy, double a_tax_buy, double a_commission_buy,
-    double a_amount_sell, double a_tax_sell, double a_commission_sell)
+pub fn calculate_cost_total(a_amount_buy: f64, a_tax_buy: f64, a_commission_buy: f64, a_amount_sell: f64, a_tax_sell: f64, a_commission_sell: f64) -> f64
 {
-    return a_tax_buy / 100.0 * a_amount_buy + a_commission_buy + a_tax_sell / 100.0 * a_amount_sell + a_commission_sell;
-}*/
+    a_tax_buy / 100.0 * a_amount_buy + a_commission_buy + a_tax_sell / 100.0 * a_amount_sell + a_commission_sell
+}
 
 /**********************************************************************
  * calculate_profit_loss:
