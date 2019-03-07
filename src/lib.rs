@@ -329,12 +329,17 @@ pub fn cost_transaction(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f
  * calculate_cost_other:
  * Calculates other costs based on the difference that remains.
  **********************************************************************/
-/*double calculate_cost_other(double a_profit_loss, double a_profit_loss_total, double a_cost_total)
+pub fn calculate_cost_other(a_profit_loss: f64, a_profit_loss_total: f64, a_cost_total: f64) -> f64
 {
-    double l_diff_cost_profit = 0.0;
-    l_diff_cost_profit = a_profit_loss - a_profit_loss_total - a_cost_total;
-    if (fabs(l_diff_cost_profit) > 0.0)
-        return l_diff_cost_profit;
+    let result;
+    let l_diff_cost_profit = a_profit_loss - a_profit_loss_total - a_cost_total;
+    if l_diff_cost_profit.abs() > 0.0
+    {
+        result = l_diff_cost_profit;
+    }
     else
-      return 0.0;
-}*/
+    {
+      result = 0.0;
+    }
+    result
+}
