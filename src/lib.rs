@@ -306,10 +306,10 @@ pub fn cost_transaction(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f
  * profit_loss = S.Ps - S.Pb
  * => it's the same for long and short
  **********************************************************************/
-/*double calculate_profit_loss(double a_price_buy, int a_shares_buy, double a_price_sell, int a_shares_sell)
+pub fn calculate_profit_loss(a_price_buy: f64, a_shares_buy: i32, a_price_sell: f64, a_shares_sell: i32) -> f64
 {
-    return a_shares_sell * a_price_sell - a_shares_buy * a_price_buy;
-}*/
+    (a_shares_sell as f64) * a_price_sell - (a_shares_buy as f64) * a_price_buy
+}
 
 /**********************************************************************
  * calculate_profit_loss_total:
