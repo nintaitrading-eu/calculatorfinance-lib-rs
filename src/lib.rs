@@ -239,23 +239,23 @@ pub fn cost_transaction(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f
  * calculate_price:
  * Calculates the price when buying or selling.
  **********************************************************************/
-/*double calculate_price(double a_amount, int a_shares, double a_tax, double a_commission, transaction_type_t a_transaction_type)
+pub fn calculate_price(a_amount: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_transaction_type: TransactionType) -> f64
 {
-    double l_numerator = 0.0;
-    double l_denominator = 0.0;
+    let l_numerator;
+    let l_denominator;
     
-    if (a_transaction_type == BUY)
+    if a_transaction_type == TransactionType::Buy
     {
         l_numerator = a_amount - a_commission;
-        l_denominator = (1.0 + a_tax / 100.0) * a_shares;
+        l_denominator = (1.0 + a_tax / 100.0) * (a_shares as f64);
     }
     else
     {
         l_numerator = a_amount + a_commission;
-        l_denominator = (1.0 - a_tax / 100.0) * a_shares;
+        l_denominator = (1.0 - a_tax / 100.0) * (a_shares as f64);
     }
-    return l_numerator / l_denominator;
-}*/
+    l_numerator / l_denominator
+}
 
 // After trade
 
