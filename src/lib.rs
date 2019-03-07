@@ -269,15 +269,19 @@ pub fn cost_transaction(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f
  * -----
  * It's the same for long and short.
  **********************************************************************/
-/*double calculate_risk_actual(double a_price_buy, int a_shares_buy, double a_tax_buy,
-    double a_commission_buy, double a_price_sell, int a_shares_sell, double a_tax_sell,
-    double a_commission_sell, double a_risk_initial, double a_profit_loss)
+pub fn calculate_risk_actual(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk_initial: f64, a_profit_loss: f64) -> f64
 {
-    if (((a_profit_loss < 0.0) && (fabs(a_profit_loss) < a_risk_initial)) || (a_profit_loss >= 0.0))
-        return a_risk_initial;
+    let result;
+    if ((a_profit_loss < 0.0) && (a_profit_loss.abs() < a_risk_initial)) || (a_profit_loss >= 0.0)
+    {
+        result = a_risk_initial;
+    }
     else
-        return a_shares_buy * a_price_buy * (1.0 + a_tax_buy / 100.0) - a_shares_sell * a_price_sell * (1.0 - a_tax_sell / 100.0) + a_commission_buy + a_commission_sell;
-}*/
+    {
+        result = (a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0) - (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) + a_commission_buy + a_commission_sell;
+    }
+    result 
+}
 
 /**********************************************************************
  * calculate_r_multiple:
