@@ -227,13 +227,19 @@ pub fn cost_transaction(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f
  * cost_tax:
  * Cost of tax (buy and sell)
  **********************************************************************/
-/*double cost_tax(double a_amount, double a_commission, int a_shares, double a_price, transaction_type_t a_transaction_type)
+pub fn cost_tax(a_amount: f64, a_commission: f64, a_shares: i32, a_price: f64, a_transaction_type: TransactionType) -> f64
 {
-  if (a_transaction_type == SELL)
-    return - a_amount - a_commission + a_shares * a_price;
-  else
-    return a_amount - a_shares * a_price - a_commission;
-}*/
+    let result;
+    if a_transaction_type == TransactionType::Sell
+    {
+      result = - a_amount - a_commission + (a_shares as f64) * a_price;
+    }
+    else
+    {
+      result = a_amount - (a_shares as f64) * a_price - a_commission;
+    }
+    result
+}
 
 /**********************************************************************
  * calculate_price:
