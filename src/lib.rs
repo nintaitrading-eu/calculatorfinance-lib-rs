@@ -283,10 +283,10 @@ pub fn cost_transaction(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f
  * calculate_r_multiple:
  * Function to calculate R-multiple.
  **********************************************************************/
-/*double calculate_r_multiple(double a_profit_loss, double a_risk_initial)
+pub fn calculate_r_multiple(a_profit_loss: f64, a_risk_initial: f64) -> f64
 {
-    return a_profit_loss / a_risk_initial;
-}*/
+    a_profit_loss / a_risk_initial
+}
 
 /**********************************************************************
  * calculate_cost_total:
