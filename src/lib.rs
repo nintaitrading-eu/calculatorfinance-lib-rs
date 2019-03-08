@@ -7,6 +7,13 @@ pub enum TransactionType
     Sell
 }
 
+#[derive(Debug, PartialEq)]
+pub struct SharesPrice
+{
+    shares: i32,
+    price: f64,
+}
+
 /**********************************************************************
  * calculate_average_price:
  * Calculate the average price, based on previous transactions.
@@ -25,9 +32,9 @@ pub enum TransactionType
  * => P3 = (415 * 23.65 + 138 * 16.50) / 553
  * => P3 = 21.8657
  **********************************************************************/
-/*pub fn calculate_average_price -> (int a_nargs, ...)
+pub fn calculate_average_price(a_sharesprice_vec: Vec<SharesPrice>) -> f64
 {
-    register int l_i;
+    /*register int l_i;
     va_list l_ap;
     SharesPrice l_current;
     double l_denominator, l_numerator;
@@ -42,8 +49,10 @@ pub enum TransactionType
          l_numerator += l_current.sp_shares;
     }
     va_end(l_ap);
-    return (double)(l_denominator / l_numerator);
-}*/
+    return (double)(l_denominator / l_numerator);*/
+    // TODO: figure the rest out
+    0.0
+}
 
 /**********************************************************************
  * calculate_percentage_of:
