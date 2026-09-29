@@ -1,5 +1,8 @@
 /* See LICENSE.txt file for license and copyright information. */
 
+#[cfg(test)]
+mod test;
+
 #[derive(Debug, PartialEq)]
 pub enum TransactionType
 {
@@ -45,24 +48,6 @@ pub fn calculate_average_price(a_sharesprice_vec: Vec<SharesPrice>) -> f64
     }
 
     total_cost / total_shares
-}
-
-#[cfg(test)]
-mod tests
-{
-    use super::{calculate_average_price, SharesPrice};
-
-    #[test]
-    fn average_price_is_weighted_by_shares()
-    {
-        let transactions = vec![
-            SharesPrice { shares: 415, price: 23.65 },
-            SharesPrice { shares: 138, price: 16.50 },
-        ];
-
-        let expected = (415.0 * 23.65 + 138.0 * 16.50) / 553.0;
-        assert!((calculate_average_price(transactions) - expected).abs() < 1e-10);
-    }
 }
 
 /**********************************************************************
