@@ -34,24 +34,35 @@ pub struct SharesPrice
  **********************************************************************/
 pub fn calculate_average_price(a_sharesprice_vec: Vec<SharesPrice>) -> f64
 {
-    /*register int l_i;
-    va_list l_ap;
-    SharesPrice l_current;
-    double l_denominator, l_numerator;
+    let mut total_cost = 0.0;
+    let mut total_shares = 0.0;
 
-    va_start(l_ap, a_nargs);
-    l_denominator = 0.0;
-    l_numerator = 0.0;
-    for (l_i = 0; l_i < a_nargs; l_i++)
+    for shares_price in a_sharesprice_vec
     {
-         l_current = va_arg(l_ap, SharesPrice);
-         l_denominator += l_current.sp_shares * l_current.sp_price;
-         l_numerator += l_current.sp_shares;
+        let shares = shares_price.shares as f64;
+        total_cost += shares * shares_price.price;
+        total_shares += shares;
     }
-    va_end(l_ap);
-    return (double)(l_denominator / l_numerator);*/
-    // TODO: figure the rest out
-    0.0
+
+    total_cost / total_shares
+}
+
+#[cfg(test)]
+mod tests
+{
+    use super::{calculate_average_price, SharesPrice};
+
+    #[test]
+    fn average_price_is_weighted_by_shares()
+    {
+        let transactions = vec![
+            SharesPrice { shares: 415, price: 23.65 },
+            SharesPrice { shares: 138, price: 16.50 },
+        ];
+
+        let expected = (415.0 * 23.65 + 138.0 * 16.50) / 553.0;
+        assert!((calculate_average_price(transactions) - expected).abs() < 1e-10);
+    }
 }
 
 /**********************************************************************
