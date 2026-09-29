@@ -105,7 +105,7 @@ pub fn calculate_shares_recommended(a_pool: f64, a_commission: f64, a_tax: f64, 
        // Note: The int typecast performs truncation. It's better to buy a contract less, than
        // to buy a contract too much. So this truncation provides extra safety and is
        // indeed what we want.
-       (((a_pool - (a_tax / 100.0 * a_pool) - a_commission) / a_price) as i32)
+       ((a_pool - (a_tax / 100.0 * a_pool) - a_commission) / a_price) as i32
 }
 
 /**********************************************************************
