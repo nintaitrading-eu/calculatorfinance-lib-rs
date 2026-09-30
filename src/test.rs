@@ -100,14 +100,14 @@ fn price_from_buy_and_sell_amounts()
 #[test]
 fn actual_risk_uses_initial_risk_when_loss_is_within_it_or_trade_is_profitable()
 {
-    assert_close(calculate_risk_actual(100.0, 10, 1.0, 5.0, 90.0, 10, 2.0, 7.0, 150.0, -100.0), 150.0);
-    assert_close(calculate_risk_actual(100.0, 10, 1.0, 5.0, 110.0, 10, 2.0, 7.0, 150.0, 100.0), 150.0);
+    assert_close(calculate_risk_actual(100.0, 10, 1.0, 5.0, 90.0, 10, 2.0, 7.0, 150.0, -100.0, TradeType::Long), 150.0);
+    assert_close(calculate_risk_actual(100.0, 10, 1.0, 5.0, 110.0, 10, 2.0, 7.0, 150.0, 100.0, TradeType::Long), 150.0);
 }
 
 #[test]
 fn actual_risk_uses_trade_amounts_when_loss_exceeds_initial_risk()
 {
-    assert_close(calculate_risk_actual(100.0, 10, 1.0, 5.0, 90.0, 10, 2.0, 7.0, 100.0, -150.0), 140.0);
+    assert_close(calculate_risk_actual(100.0, 10, 1.0, 5.0, 90.0, 10, 2.0, 7.0, 100.0, -150.0, TradeType::Long), 140.0);
 }
 
 #[test]
@@ -125,13 +125,13 @@ fn total_cost_includes_both_sides_of_the_trade()
 #[test]
 fn profit_loss_uses_buy_and_sell_amounts()
 {
-    assert_close(calculate_profit_loss(100.0, 10, 120.0, 10), 200.0);
+    assert_close(calculate_profit_loss(100.0, 10, 120.0, 10, TradeType::Long), 200.0);
 }
 
 #[test]
 fn total_profit_loss_deducts_commissions()
 {
-    assert_close(calculate_profit_loss_total(100.0, 10, 0.0, 5.0, 120.0, 10, 0.0, 7.0), 188.0);
+    assert_close(calculate_profit_loss_total(100.0, 10, 0.0, 5.0, 120.0, 10, 0.0, 7.0, TradeType::Long), 188.0);
 }
 
 #[test]

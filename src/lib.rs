@@ -11,6 +11,13 @@ pub enum TransactionType
 }
 
 #[derive(Debug, PartialEq)]
+pub enum TradeType
+{
+    Long,
+    Short
+}
+
+#[derive(Debug, PartialEq)]
 pub struct SharesPrice
 {
     shares: i32,
@@ -234,16 +241,14 @@ pub fn cost_transaction(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f
  **********************************************************************/
 pub fn cost_tax(a_amount: f64, a_commission: f64, a_shares: i32, a_price: f64, a_transaction_type: TransactionType) -> f64
 {
-    let result;
     if a_transaction_type == TransactionType::Sell
     {
-      result = - a_amount - a_commission + (a_shares as f64) * a_price;
+      - a_amount - a_commission + (a_shares as f64) * a_price
     }
     else
     {
-      result = a_amount - (a_shares as f64) * a_price - a_commission;
+      a_amount - (a_shares as f64) * a_price - a_commission
     }
-    result
 }
 
 /**********************************************************************
@@ -275,23 +280,28 @@ pub fn calculate_price(a_amount: f64, a_shares: i32, a_tax: f64, a_commission: f
  * Calculates the risk we actually took,
  * based on the data in TABLE_TRADE.
  * Note:
- * risk_actual = S.Pb + S.Pb.T + Cb - (S.Ps - S.Ps.T - Cs)
- * Note:
  * -----
- * It's the same for long and short.
+ * For long trades: risk_actual = S.Pb + S.Pb.T + Cb - (S.Ps - S.Ps.T - Cs)
+ * For short trades: risk_actual = S.Ps + S.Ps.T + Cs - (S.Pb - S.Pb.T - Cb)
  **********************************************************************/
-pub fn calculate_risk_actual(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk_initial: f64, a_profit_loss: f64) -> f64
+pub fn calculate_risk_actual(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk_initial: f64, a_profit_loss: f64, a_trade_type: TradeType) -> f64
 {
-    let result;
     if ((a_profit_loss < 0.0) && (a_profit_loss.abs() < a_risk_initial)) || (a_profit_loss >= 0.0)
     {
-        result = a_risk_initial;
+        a_risk_initial
+    }
+    else if a_trade_type == TradeType::Long
+    {
+        (a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0) - (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) + a_commission_buy + a_commission_sell
+    }
+    else if a_trade_type == TradeType::Short
+    {
+        (a_shares_sell as f64) * a_price_sell * (1.0 + a_tax_sell / 100.0) - (a_shares_buy as f64) * a_price_buy * (1.0 - a_tax_buy / 100.0) + a_commission_sell + a_commission_buy
     }
     else
     {
-        result = (a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0) - (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) + a_commission_buy + a_commission_sell;
+        panic!("Invalid code path in calculate_risk_actual.")
     }
-    result 
 }
 
 /**********************************************************************
@@ -317,12 +327,23 @@ pub fn calculate_cost_total(a_amount_buy: f64, a_tax_buy: f64, a_commission_buy:
  * Calculates the profit_loss, without taking tax and commission into account.
  * Note:
  * -----
- * profit_loss = S.Ps - S.Pb
- * => it's the same for long and short
+ * For long trades: profit_loss = S.Ps - S.Pb
+ * For short trades: profit_loss = S.Pb - S.Ps
  **********************************************************************/
-pub fn calculate_profit_loss(a_price_buy: f64, a_shares_buy: i32, a_price_sell: f64, a_shares_sell: i32) -> f64
+pub fn calculate_profit_loss(a_price_buy: f64, a_shares_buy: i32, a_price_sell: f64, a_shares_sell: i32, a_trade_type: TradeType) -> f64
 {
-    (a_shares_sell as f64) * a_price_sell - (a_shares_buy as f64) * a_price_buy
+    if a_trade_type == TradeType::Long
+    {
+        (a_shares_sell as f64) * a_price_sell - (a_shares_buy as f64) * a_price_buy
+    }
+    else if a_trade_type == TradeType::Short
+    {
+        (a_shares_buy as f64) * a_price_buy - (a_shares_sell as f64) * a_price_sell
+    }
+    else
+    {
+        panic!("Invalid code path in calculate_profit_loss.")
+    }
 }
 
 /**********************************************************************
@@ -330,12 +351,23 @@ pub fn calculate_profit_loss(a_price_buy: f64, a_shares_buy: i32, a_price_sell: 
  * Calculates the total profit_loss.
  * Note:
  * -----
- * profit_loss = S.Ps - S.Ps.T - C - (S.Pb + S.Pb.T + C)
- * => it's the same for long and short
+ * For long trades: profit_loss = S.Ps - S.Ps.T - C - (S.Pb + S.Pb.T + C)
+ * For short trades: profit_loss = S.Pb - S.Pb.T - C - (S.Ps + S.Ps.T + C)
  **********************************************************************/
-pub fn calculate_profit_loss_total(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64) -> f64
+pub fn calculate_profit_loss_total(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_trade_type: TradeType) -> f64
 {
-    (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) - (a_shares_buy as f64) * a_price_buy * (1.0 - a_tax_buy / 100.0) - (a_commission_buy + a_commission_sell)
+    if a_trade_type == TradeType::Long
+    {
+        (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) - (a_shares_buy as f64) * a_price_buy * (1.0 - a_tax_buy / 100.0) - (a_commission_buy + a_commission_sell)
+    }
+    else if a_trade_type == TradeType::Short
+    {
+        (a_shares_buy as f64) * a_price_buy * (1.0 - a_tax_buy / 100.0) - (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) - (a_commission_sell + a_commission_buy)
+    }
+    else
+    {
+        panic!("Invalid code path in calculate_profit_loss_total.")
+    }
 }
 
 /**********************************************************************
@@ -344,15 +376,13 @@ pub fn calculate_profit_loss_total(a_price_buy: f64, a_shares_buy: i32, a_tax_bu
  **********************************************************************/
 pub fn calculate_cost_other(a_profit_loss: f64, a_profit_loss_total: f64, a_cost_total: f64) -> f64
 {
-    let result;
     let l_diff_cost_profit = a_profit_loss - a_profit_loss_total - a_cost_total;
     if l_diff_cost_profit.abs() > 0.0
     {
-        result = l_diff_cost_profit;
+        l_diff_cost_profit
     }
     else
     {
-      result = 0.0;
+      0.0
     }
-    result
 }
