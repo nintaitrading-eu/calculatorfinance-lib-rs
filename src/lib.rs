@@ -116,11 +116,11 @@ pub fn calculate_leveraged_contracts(a_n: i32) -> i32
  * Note:
  * Long
  * ----
- * amount selling at stoploss - amount at buying = initial risk of pool
- * (S.Pb + S.Pb.T + C) - (S.Ps - S.Ps.T - C) = R/100 * pool
+ * amount at buying - amount selling at stoploss  = initial risk of pool
+ * (S.Pb + S.Pb.T + C) - (S.Psl - S.Psl.T - C) = R/100 * pool
  * Short
  * -----
- * amount selling - amount buying at stoploss = initial risk of pool
+ * amount buying at stoploss - amount selling  = initial risk of pool
  * (S.Psl + S.Psl.T + C) - (S.Ps - S.Ps.T - C) = R/100 * pool
  **********************************************************************/
 pub fn calculate_stoploss(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_risk: f64, a_pool: f64, a_trade_type: TradeType) -> f64
@@ -166,16 +166,14 @@ pub fn calculate_risk_input(a_pool: f64, a_risk: f64) -> f64
  **********************************************************************/
 pub fn calculate_risk_initial(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_stoploss: f64, a_trade_type: TradeType) -> f64
 {
-    let result;
-    if TradeType::Long
+    if a_trade_type == TradeType::Long
     {
-        result = (a_shares as f64) * a_price * (1.0 + a_tax / 100.0) - (a_shares as f64) * a_stoploss * (1.0 - a_tax / 100.0) + 2.0 * a_commission;
+        (a_shares as f64) * a_price * (1.0 + a_tax / 100.0) - (a_shares as f64) * a_stoploss * (1.0 - a_tax / 100.0) + 2.0 * a_commission
     }
     else
     {
-        result = (a_shares as f64) * a_stoploss * (1.0 + a_tax / 100.0) - (a_shares as f64) * a_price * (1.0 - a_tax / 100.0) + 2.0 * a_commission;
+        (a_shares as f64) * a_stoploss * (1.0 + a_tax / 100.0) - (a_shares as f64) * a_price * (1.0 - a_tax / 100.0) + 2.0 * a_commission
     }
-    result
 }
 
 /**********************************************************************
