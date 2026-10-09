@@ -117,27 +117,67 @@ pub fn calculate_leveraged_contracts(a_n: i32) -> i32
  * Long
  * ----
  * amount at buying - amount selling at stoploss  = initial risk of pool
- * (S.Pb + S.Pb.T + C) - (S.Psl - S.Psl.T - C) = R/100 * pool
+ * (Sb.Pb + Sb.Pb.Tb + Cb) - (Ssl.Psl - Ssl.Psl.Tsl - Csl) = R/100 * pool
+ * => Sb.Pb.(1 + Tb) + Cb - Ssl.Psl.(1 - Tsl) + Csl = R/100 * pool
+ * => - Ssl.Psl.(1 - Tsl) = R/100 * pool - Sb.Pb.(1 + Tb) - Cb - Csl
+ * => Psl = (R/100 * pool - Sb.Pb.(1 + Tb) - Cb - Csl) / -Ssl.(1 - Tsl)
  * Short
  * -----
  * amount buying at stoploss - amount selling  = initial risk of pool
- * (S.Psl + S.Psl.T + C) - (S.Ps - S.Ps.T - C) = R/100 * pool
+ * (Ssl.Psl + Ssl.Psl.Tsl + Csl) - (Ss.Ps - Ss.Ps.Ts - Cs) = R/100 * pool
+ * => Ssl.Psl + Ssl.Psl.Tsl + Csl - Ss.Ps + Ss.Ps.Ts + Cs = R/100 * pool
+ * => Psl.Ssl.(1 + Tsl) + Csl - Ss.Ps (1 + Ts) + Cs = R/100 * pool
+ * => Psl.Ssl.(1 + Tsl) = R/100 * pool - Csl + Ss.Ps.(1 + Ts) - Cs
+ * => Psl = (R/100 * pool + Ss.Ps.(1 + Ts) - Csl - Cs) / Ssl.(1 + Tsl)
+ *
+ * => Long: sl = sell, Short: sl = buy
  **********************************************************************/
-pub fn calculate_stoploss(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_risk: f64, a_pool: f64, a_trade_type: TradeType) -> f64
+pub fn calculate_stoploss(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk: f64, a_pool: f64, a_trade_type: TradeType) -> f64
 {
     let l_numerator;
     let l_denominator;
     if a_trade_type == TradeType::Long
     {
-        l_numerator = (a_shares as f64) * a_price * (1.0 + a_tax / 100.0) - a_risk / 100.0 * a_pool + 2.0 * a_commission;
-        l_denominator = (a_shares as f64) * 1.0 - a_tax / 100.0;
+        l_numerator = a_risk / 100.0 * a_pool - (a_shares_sell as f64) * a_price_sell * (1.0 + a_tax_sell / 100.0) - a_commission_sell - a_commission_sell;
+        l_denominator = -(a_shares_sell as f64) * (1.0 - a_tax_sell / 100.0);
     }
     else
     {
-        l_numerator = a_risk / 100.0 * a_pool + (a_shares as f64) * a_price * (1.0 - a_tax / 100.0) - 2.0 * a_commission;
-        l_denominator = (a_shares as f64) * 1.0 + a_tax / 100.0;
+        l_numerator = a_risk / 100.0 * a_pool + (a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0) - a_commission_buy - a_commission_buy;
+        l_denominator = (a_shares_buy as f64) * (1.0 + a_tax_buy / 100.0);
     }
     l_numerator / l_denominator
+}
+
+/**********************************************************************
+ * calculate_risk_percentage:
+ * Calculates the R value (risk of pool, based on the stoploss).
+ * Note:
+ * Long
+ * ----
+ * amount at buying - amount selling at stoploss  = initial risk of pool
+ * (Sb.Pb + Sb.Pb.Tb + Cb) - (Ssl.Psl - Ssl.Psl.Tsl - Csl) = R/100 * pool
+ * => Sb.Pb.(1 + Tb) + Cb - Ssl.Psl.(1 - Tsl) + Csl = R/100 * pool
+ * => R = (Sb.Pb.(1 + Tb) - Ssl.Psl.(1 - Tsl) + Cb + Csl) * 100/pool
+ * Short
+ * -----
+ * amount buying at stoploss - amount selling  = initial risk of pool
+ * (Ssl.Psl + Ssl.Psl.Tsl + Csl) - (Ss.Ps - Ss.Ps.Ts - Cs) = R/100 * pool
+ * => Ssl.Psl + Ssl.Psl.Tsl + Csl - Ss.Ps.(1 - Ts) + Cs = R/100 * pool
+ * => Ssl.Psl + Ssl.Psl.Tsl + Csl - Ss.Ps.(1 - Ts) + Cs = R/100 * pool
+ * => Ssl.Psl.(1 + Tsl) + Csl - Ss.Ps (1 - Ts) + Cs = R/100 * pool
+ * => R = (Ssl.Psl.(1 + Tsl) - Ss.Ps.(1 - Ts) + Csl + Cs) * 100/pool
+ **********************************************************************/
+pub fn calculate_risk_percentage(a_price_buy: f64, a_shares_buy: i32, a_commission_buy: f64, a_tax_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_stoploss: f64, a_pool: f64, a_trade_type: TradeType) -> f64
+{
+    if a_trade_type == TradeType::Long
+    {
+        ((a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0) - (a_shares_sell as f64) * a_stoploss * (1.0 - a_tax_sell / 100.0) + a_commission_buy + a_commission_sell) * 100.0/a_pool
+    }
+    else
+    {
+        ((a_shares_buy as f64) * a_stoploss * (1.0 + a_tax_buy / 100.0) - (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) + a_commission_buy + a_commission_sell) * 100.0/a_pool
+    }
 }
 
 /**********************************************************************

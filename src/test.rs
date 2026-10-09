@@ -45,10 +45,22 @@ fn leveraged_contracts_round_up_in_groups_of_three()
 }
 
 #[test]
-fn stoploss_for_long_and_short_positions()
+fn stoploss_for_long_positions()
 {
-    assert_close(calculate_stoploss(100.0, 10, 0.0, 5.0, 5.0, 1000.0, TradeType::Long), 96.0);
-    assert_close(calculate_stoploss(100.0, 10, 0.0, 5.0, 5.0, 1000.0, TradeType::Short), 104.0);
+    assert_close(calculate_stoploss(100.0, 10, 0.0, 5.0, 100.0, 10, 0.0, 5.0, 2.0, 1000.0, TradeType::Long), 99.0);
+}
+
+#[test]
+fn stoploss_for_short_positions()
+{
+    assert_close(calculate_stoploss(100.0, 10, 0.0, 5.0, 100.0, 10, 0.0, 5.0, 2.0, 1000.0, TradeType::Short), 101.0);
+}
+
+#[test]
+fn risk_percentage_accounts_for_tax_and_commission_on_both_trade_types()
+{
+    assert_close(calculate_risk_percentage(100.0, 10, 5.0, 1.0, 100.0, 10, 2.0, 7.0, 96.0, 1000.0, TradeType::Long), 8.12);
+    assert_close(calculate_risk_percentage(100.0, 10, 5.0, 1.0, 100.0, 10, 2.0, 7.0, 104.0, 1000.0, TradeType::Short), 8.24);
 }
 
 #[test]
