@@ -29,6 +29,7 @@ pub struct SharesPrice
  * Calculate the average price, based on previous transactions.
  * It requires a SharesPrice struct list, preceded by the total number
  * of records.
+ *
  * Note:
  * -----
  * S1 = 415, P1 = 23.65, S2 = 138, P2 = 16.50
@@ -116,16 +117,18 @@ pub fn calculate_leveraged_contracts(a_n: i32) -> i32
  * Calculates the R value (risk of pool, based on the stoploss).
  * Modified version to estimate, when the incomplete trade only has the first
  * part of the given values.
- * Note:
- * For long, the values for buy are used.
- * For short, the values for sell are used.
- * That is what you start with.
+ *
  * Long
  * ----
  * amount at buying - amount selling at stoploss  = initial risk of pool
  * (Sb.Pb + Sb.Pb.Tb + Cb) - (Ssl.Psl - Ssl.Psl.Tsl - Csl) = R/100 * pool
  * => Sb.Pb.(1 + Tb) + Cb - Ssl.Psl.(1 - Tsl) + Csl = R/100 * pool
  * => R = (Sb.Pb.(1 + Tb) - Ssl.Psl.(1 - Tsl) + Cb + Csl) * 100/pool
+ *
+ * The values for buy are used.
+ * The real value will be a little different, because of that, but we
+ * can only know this when we actually close the trade.
+ *
  * Short
  * -----
  * amount buying at stoploss - amount selling  = initial risk of pool
@@ -134,6 +137,10 @@ pub fn calculate_leveraged_contracts(a_n: i32) -> i32
  * => Ssl.Psl + Ssl.Psl.Tsl + Csl - Ss.Ps.(1 - Ts) + Cs = R/100 * pool
  * => Ssl.Psl.(1 + Tsl) + Csl - Ss.Ps (1 - Ts) + Cs = R/100 * pool
  * => R = (Ssl.Psl.(1 + Tsl) - Ss.Ps.(1 - Ts) + Csl + Cs) * 100/pool
+ *
+ * For short, the values for sell are used.
+ * The real value will be a little different, because of that, but we
+ * can only know this when we actually close the trade.
  **********************************************************************/
 pub fn calculate_risk_percentage_initial(a_price_buy: f64, a_shares_buy: i32, a_commission_buy: f64, a_tax_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_stoploss: f64, a_pool: f64, a_trade_type: TradeType) -> f64
 {
@@ -193,10 +200,7 @@ pub fn calculate_risk_input(a_pool: f64, a_risk: f64) -> f64
  * calculate_stoploss_initial:
  * Calculates the stoploss based on total pool and input.
  * Consider this the theoretical stoploss we want to take.
- * It takes the tax at buy and commission at buy.
- * The real value will be a little different, because of that, but we
- * can only know this when we actually sell.
- * Note:
+ *
  * Long
  * ----
  * amount at buying - amount selling at stoploss  = initial risk of pool
@@ -204,6 +208,11 @@ pub fn calculate_risk_input(a_pool: f64, a_risk: f64) -> f64
  * => Sb.Pb.(1 + Tb) + Cb - Ssl.Psl.(1 - Tsl) + Csl = R/100 * pool
  * => - Ssl.Psl.(1 - Tsl) = R/100 * pool - Sb.Pb.(1 + Tb) - Cb - Csl
  * => Psl = (R/100 * pool - Sb.Pb.(1 + Tb) - Cb - Csl) / -Ssl.(1 - Tsl)
+ *
+ * It takes the tax at buy and commission at buy.
+ * The real value will be a little different, because of that, but we
+ * can only know this when we actually close the trade.
+ *
  * Short
  * -----
  * amount buying at stoploss - amount selling  = initial risk of pool
@@ -212,6 +221,10 @@ pub fn calculate_risk_input(a_pool: f64, a_risk: f64) -> f64
  * => Psl.Ssl.(1 + Tsl) + Csl - Ss.Ps (1 + Ts) + Cs = R/100 * pool
  * => Psl.Ssl.(1 + Tsl) = R/100 * pool - Csl + Ss.Ps.(1 + Ts) - Cs
  * => Psl = (R/100 * pool + Ss.Ps.(1 + Ts) - Csl - Cs) / Ssl.(1 + Tsl)
+ *
+ * It takes the tax at sell and commission at sell.
+ * The real value will be a little different, because of that, but we
+ * can only know this when we actually close the trade.
  *
  * => Long: sl = sell, Short: sl = buy
  **********************************************************************/
@@ -238,23 +251,34 @@ pub fn calculate_stoploss_initial(a_price_buy: f64, a_shares_buy: i32, a_tax_buy
  * This is the risk we will take if our stoploss is reached.
  * This should be almost equal to the risk_input if everything was
  * correctly calculated. Except for the tax and commission difference.
- * Note:
+ *
  * Long
  * ----
  * S.Pb + S.Pb.T + C - (S.Psl - S.Psl.T - C)
+ *
+ * It takes the tax at buy and commission at buy.
+ * The real value will be a little different, because of that, but we
+ * can only know this when we actually close the trade.
+ *
  * Short
  * -----
  * S.Ps + S.Psl.T + C - (S.Ps - S.Ps.T - C)
+ *
+ * It takes the tax at sell and commission at sell.
+ * The real value will be a little different, because of that, but we
+ * can only know this when we actually close the trade.
+ *
+ * => Long: sl = sell, Short: sl = buy
  **********************************************************************/
-pub fn calculate_risk_initial(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_stoploss: f64, a_trade_type: TradeType) -> f64
+pub fn calculate_risk_initial(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32,  a_tax_sell: f64, a_commission_sell: f64, a_stoploss: f64, a_trade_type: TradeType) -> f64
 {
     if a_trade_type == TradeType::Long
     {
-        (a_shares as f64) * a_price * (1.0 + a_tax / 100.0) - (a_shares as f64) * a_stoploss * (1.0 - a_tax / 100.0) + 2.0 * a_commission
+        (a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0) - (a_shares_buy as f64) * a_stoploss * (1.0 - a_tax_buy / 100.0) + 2.0 * a_commission_buy
     }
     else
     {
-        (a_shares as f64) * a_stoploss * (1.0 + a_tax / 100.0) - (a_shares as f64) * a_price * (1.0 - a_tax / 100.0) + 2.0 * a_commission
+        (a_shares_sell as f64) * a_stoploss * (1.0 + a_tax_sell / 100.0) - (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) + 2.0 * a_commission
     }
 }
 
@@ -270,6 +294,7 @@ pub fn calculate_amount(a_price: f64, a_shares: i32) -> f64
 /**********************************************************************
  * calculate_amount_with_tax_and_commission:
  * Calculates the amount, including tax and commission.
+ *
  * Note:
  * -----
  * AMT = SP + SPT + C (buy)
@@ -288,22 +313,6 @@ pub fn calculate_amount_with_tax_and_commission(a_price: f64, a_shares: i32, a_t
     }
     result
 }
-
-/**********************************************************************
- * calculate_amount_with_tax:
- * Calculates the amount (buy/sell) with tax included, but not the commission.
- * Note:
- * -----
- * profit_loss = S.P + S.P.T (buy)
- * profit_loss = S.P - S.P.T (sell)
- **********************************************************************/
-/*double calculate_amount_with_tax(double a_price, int a_shares, double a_tax, transaction_type_t a_transaction_type)
-{
-    if (a_transaction_type == BUY)
-        return a_shares * a_price * (1.0 - a_tax / 100.0);
-    else
-        return a_shares * a_price * (1.0 + a_tax / 100.0);
-}*/
 
 /**********************************************************************
  * cost_transaction:
@@ -357,7 +366,8 @@ pub fn calculate_price(a_amount: f64, a_shares: i32, a_tax: f64, a_commission: f
 /**********************************************************************
  * calculate_risk:
  * Calculates the risk we actually took,
- * based on the data in TABLE_TRADE.
+ * based on all the data of the trade.
+ *
  * Note:
  * -----
  * For long trades: risk = S.Pb + S.Pb.T + Cb - (S.Ps - S.Ps.T - Cs)
@@ -388,7 +398,7 @@ pub fn calculate_risk(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_com
  * Calculates the stoploss, after the trade has closed.
  * This gives us the real value, which should be close
  * to the theoretical value.
- * Note:
+ *
  * Long
  * ----
  * amount at buying - amount selling at stoploss  = initial risk of pool
@@ -396,6 +406,7 @@ pub fn calculate_risk(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_com
  * => Sb.Pb.(1 + Tb) + Cb - Ssl.Psl.(1 - Tsl) + Csl = R/100 * pool
  * => - Ssl.Psl.(1 - Tsl) = R/100 * pool - Sb.Pb.(1 + Tb) - Cb - Csl
  * => Psl = (R/100 * pool - Sb.Pb.(1 + Tb) - Cb - Csl) / -Ssl.(1 - Tsl)
+ *
  * Short
  * -----
  * amount buying at stoploss - amount selling  = initial risk of pool
@@ -445,6 +456,7 @@ pub fn calculate_cost_total(a_amount_buy: f64, a_tax_buy: f64, a_commission_buy:
 /**********************************************************************
  * calculate_profit_loss:
  * Calculates the profit_loss, without taking tax and commission into account.
+ *
  * Note:
  * -----
  * For long trades: profit_loss = S.Ps - S.Pb
@@ -469,6 +481,7 @@ pub fn calculate_profit_loss(a_price_buy: f64, a_shares_buy: i32, a_price_sell: 
 /**********************************************************************
  * calculate_profit_loss_total:
  * Calculates the total profit_loss.
+ *
  * Note:
  * -----
  * For long trades: profit_loss = S.Ps - S.Ps.T - C - (S.Pb + S.Pb.T + C)
