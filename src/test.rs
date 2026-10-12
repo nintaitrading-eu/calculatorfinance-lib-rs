@@ -59,14 +59,14 @@ fn stoploss_for_short_positions()
 #[test]
 fn risk_percentage_accounts_for_tax_and_commission_on_both_trade_types()
 {
-    assert_close(calculate_risk_percentage(100.0, 10, 5.0, 1.0, 100.0, 10, 2.0, 7.0, 96.0, 1000.0, TradeType::Long), 8.12);
-    assert_close(calculate_risk_percentage(100.0, 10, 5.0, 1.0, 100.0, 10, 2.0, 7.0, 104.0, 1000.0, TradeType::Short), 8.24);
+    assert_close(calculate_risk_percentage(100.0, 10, 1.0, 5.0, 100.0, 10, 2.0, 7.0, 96.0, 1000.0, TradeType::Long), 8.12);
+    assert_close(calculate_risk_percentage(100.0, 10, 1.0, 5.0, 100.0, 10, 2.0, 7.0, 104.0, 1000.0, TradeType::Short), 8.24);
 }
 
 #[test]
 fn risk_percentage_accounts_for_tax_and_commission_on_both_trade_types_for_input()
 {
-    assert_close(calculate_risk_percentage_initial(100.0, 10, 5.0, 1.0, 0.0, 0, 0.0, 0.0, 96.0, 1000.0, TradeType::Long), 6.960000000000002);
+    assert_close(calculate_risk_percentage_initial(100.0, 10, 1.0, 5.0, 0.0, 0, 0.0, 0.0, 96.0, 1000.0, TradeType::Long), 6.960000000000002);
     assert_close(calculate_risk_percentage_initial(0.0, 0, 0.0, 0.0, 100.0, 10, 5.0, 1.0, 104.0, 1000.0, TradeType::Short), 14.4);
 }
 
@@ -79,8 +79,8 @@ fn input_risk_is_a_percentage_of_the_pool()
 #[test]
 fn initial_risk_for_long_and_short_positions()
 {
-    assert_close(calculate_risk_initial(100.0, 10, 0.0, 5.0, 96.0, TradeType::Long), 50.0);
-    assert_close(calculate_risk_initial(100.0, 10, 0.0, 5.0, 104.0, TradeType::Short), 50.0);
+    assert_close(calculate_risk_initial(100.0, 10, 0.0, 5.0, 0.0, 0, 0.0, 0.0, 96.0, TradeType::Long), 50.0);
+    assert_close(calculate_risk_initial(0.0, 0, 0.0, 0.0, 100.0, 10, 0.0, 5.0, 104.0, TradeType::Short), 50.0);
 }
 
 #[test]
