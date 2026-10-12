@@ -110,46 +110,6 @@ pub fn calculate_leveraged_contracts(a_n: i32) -> i32
     (((a_n as f64) / 3.0).ceil() as i32) - 1 + a_n
 }
 
-/**********************************************************************
- * calculate_stoploss:
- * Calculates the stoploss, after the trade has closed.
- * This gives us the real value, which should be close
- * to the theoretical value.
- * Note:
- * Long
- * ----
- * amount at buying - amount selling at stoploss  = initial risk of pool
- * (Sb.Pb + Sb.Pb.Tb + Cb) - (Ssl.Psl - Ssl.Psl.Tsl - Csl) = R/100 * pool
- * => Sb.Pb.(1 + Tb) + Cb - Ssl.Psl.(1 - Tsl) + Csl = R/100 * pool
- * => - Ssl.Psl.(1 - Tsl) = R/100 * pool - Sb.Pb.(1 + Tb) - Cb - Csl
- * => Psl = (R/100 * pool - Sb.Pb.(1 + Tb) - Cb - Csl) / -Ssl.(1 - Tsl)
- * Short
- * -----
- * amount buying at stoploss - amount selling  = initial risk of pool
- * (Ssl.Psl + Ssl.Psl.Tsl + Csl) - (Ss.Ps - Ss.Ps.Ts - Cs) = R/100 * pool
- * => Ssl.Psl + Ssl.Psl.Tsl + Csl - Ss.Ps + Ss.Ps.Ts + Cs = R/100 * pool
- * => Psl.Ssl.(1 + Tsl) + Csl - Ss.Ps (1 + Ts) + Cs = R/100 * pool
- * => Psl.Ssl.(1 + Tsl) = R/100 * pool - Csl + Ss.Ps.(1 + Ts) - Cs
- * => Psl = (R/100 * pool + Ss.Ps.(1 + Ts) - Csl - Cs) / Ssl.(1 + Tsl)
- *
- * => Long: sl = sell, Short: sl = buy
- **********************************************************************/
-pub fn calculate_stoploss(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk: f64, a_pool: f64, a_trade_type: TradeType) -> f64
-{
-    let l_numerator;
-    let l_denominator;
-    if a_trade_type == TradeType::Long
-    {
-        l_numerator = a_risk / 100.0 * a_pool - (a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0) - a_commission_buy - a_commission_sell;
-        l_denominator = -(a_shares_sell as f64) * (1.0 - a_tax_sell / 100.0);
-    }
-    else
-    {
-        l_numerator = a_risk / 100.0 * a_pool + (a_shares_sell as f64) * a_price_sell * (1.0 + a_tax_sell / 100.0) - a_commission_buy - a_commission_sell;
-        l_denominator = (a_shares_buy as f64) * (1.0 + a_tax_buy / 100.0);
-    }
-    l_numerator / l_denominator
-}
 
 /**********************************************************************
  * calculate_risk_percentage_input:
@@ -395,15 +355,15 @@ pub fn calculate_price(a_amount: f64, a_shares: i32, a_tax: f64, a_commission: f
 // After trade
 
 /**********************************************************************
- * calculate_risk_actual:
+ * calculate_risk:
  * Calculates the risk we actually took,
  * based on the data in TABLE_TRADE.
  * Note:
  * -----
- * For long trades: risk_actual = S.Pb + S.Pb.T + Cb - (S.Ps - S.Ps.T - Cs)
- * For short trades: risk_actual = S.Ps + S.Ps.T + Cs - (S.Pb - S.Pb.T - Cb)
+ * For long trades: risk = S.Pb + S.Pb.T + Cb - (S.Ps - S.Ps.T - Cs)
+ * For short trades: risk = S.Ps + S.Ps.T + Cs - (S.Pb - S.Pb.T - Cb)
  **********************************************************************/
-pub fn calculate_risk_actual(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk_initial: f64, a_profit_loss: f64, a_trade_type: TradeType) -> f64
+pub fn calculate_risk(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk_initial: f64, a_profit_loss: f64, a_trade_type: TradeType) -> f64
 {
     if ((a_profit_loss < 0.0) && (a_profit_loss.abs() < a_risk_initial)) || (a_profit_loss >= 0.0)
     {
@@ -419,8 +379,49 @@ pub fn calculate_risk_actual(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64
     }
     else
     {
-        panic!("Invalid code path in calculate_risk_actual.")
+        panic!("Invalid code path in calculate_risk.")
     }
+}
+
+/**********************************************************************
+ * calculate_stoploss:
+ * Calculates the stoploss, after the trade has closed.
+ * This gives us the real value, which should be close
+ * to the theoretical value.
+ * Note:
+ * Long
+ * ----
+ * amount at buying - amount selling at stoploss  = initial risk of pool
+ * (Sb.Pb + Sb.Pb.Tb + Cb) - (Ssl.Psl - Ssl.Psl.Tsl - Csl) = R/100 * pool
+ * => Sb.Pb.(1 + Tb) + Cb - Ssl.Psl.(1 - Tsl) + Csl = R/100 * pool
+ * => - Ssl.Psl.(1 - Tsl) = R/100 * pool - Sb.Pb.(1 + Tb) - Cb - Csl
+ * => Psl = (R/100 * pool - Sb.Pb.(1 + Tb) - Cb - Csl) / -Ssl.(1 - Tsl)
+ * Short
+ * -----
+ * amount buying at stoploss - amount selling  = initial risk of pool
+ * (Ssl.Psl + Ssl.Psl.Tsl + Csl) - (Ss.Ps - Ss.Ps.Ts - Cs) = R/100 * pool
+ * => Ssl.Psl + Ssl.Psl.Tsl + Csl - Ss.Ps + Ss.Ps.Ts + Cs = R/100 * pool
+ * => Psl.Ssl.(1 + Tsl) + Csl - Ss.Ps (1 + Ts) + Cs = R/100 * pool
+ * => Psl.Ssl.(1 + Tsl) = R/100 * pool - Csl + Ss.Ps.(1 + Ts) - Cs
+ * => Psl = (R/100 * pool + Ss.Ps.(1 + Ts) - Csl - Cs) / Ssl.(1 + Tsl)
+ *
+ * => Long: sl = sell, Short: sl = buy
+ **********************************************************************/
+pub fn calculate_stoploss(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk: f64, a_pool: f64, a_trade_type: TradeType) -> f64
+{
+    let l_numerator;
+    let l_denominator;
+    if a_trade_type == TradeType::Long
+    {
+        l_numerator = a_risk / 100.0 * a_pool - (a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0) - a_commission_buy - a_commission_sell;
+        l_denominator = -(a_shares_sell as f64) * (1.0 - a_tax_sell / 100.0);
+    }
+    else
+    {
+        l_numerator = a_risk / 100.0 * a_pool + (a_shares_sell as f64) * a_price_sell * (1.0 + a_tax_sell / 100.0) - a_commission_buy - a_commission_sell;
+        l_denominator = (a_shares_buy as f64) * (1.0 + a_tax_buy / 100.0);
+    }
+    l_numerator / l_denominator
 }
 
 /**********************************************************************
