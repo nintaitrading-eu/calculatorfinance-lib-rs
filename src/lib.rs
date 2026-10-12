@@ -112,7 +112,7 @@ pub fn calculate_leveraged_contracts(a_n: i32) -> i32
 
 
 /**********************************************************************
- * calculate_risk_percentage_input:
+ * calculate_risk_percentage_initial:
  * Calculates the R value (risk of pool, based on the stoploss).
  * Modified version to estimate, when the incomplete trade only has the first
  * part of the given values.
@@ -135,7 +135,7 @@ pub fn calculate_leveraged_contracts(a_n: i32) -> i32
  * => Ssl.Psl.(1 + Tsl) + Csl - Ss.Ps (1 - Ts) + Cs = R/100 * pool
  * => R = (Ssl.Psl.(1 + Tsl) - Ss.Ps.(1 - Ts) + Csl + Cs) * 100/pool
  **********************************************************************/
-pub fn calculate_risk_percentage_input(a_price_buy: f64, a_shares_buy: i32, a_commission_buy: f64, a_tax_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_stoploss: f64, a_pool: f64, a_trade_type: TradeType) -> f64
+pub fn calculate_risk_percentage_initial(a_price_buy: f64, a_shares_buy: i32, a_commission_buy: f64, a_tax_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_stoploss: f64, a_pool: f64, a_trade_type: TradeType) -> f64
 {
     if a_trade_type == TradeType::Long
     {
@@ -182,6 +182,7 @@ pub fn calculate_risk_percentage(a_price_buy: f64, a_shares_buy: i32, a_commissi
  * calculate_risk_input:
  * Calculates the risk based on total pool and risk input.
  * Consider this the theoretical risk we want to take.
+ * Simple equation, not taking into account price, tax and commission.
  **********************************************************************/
 pub fn calculate_risk_input(a_pool: f64, a_risk: f64) -> f64
 {
@@ -189,7 +190,7 @@ pub fn calculate_risk_input(a_pool: f64, a_risk: f64) -> f64
 }
 
 /**********************************************************************
- * calculate_stoploss_input:
+ * calculate_stoploss_initial:
  * Calculates the stoploss based on total pool and input.
  * Consider this the theoretical stoploss we want to take.
  * It takes the tax at buy and commission at buy.
@@ -214,7 +215,7 @@ pub fn calculate_risk_input(a_pool: f64, a_risk: f64) -> f64
  *
  * => Long: sl = sell, Short: sl = buy
  **********************************************************************/
-pub fn calculate_stoploss_input(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk: f64, a_pool: f64, a_trade_type: TradeType) -> f64
+pub fn calculate_stoploss_initial(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk: f64, a_pool: f64, a_trade_type: TradeType) -> f64
 {
     let l_numerator;
     let l_denominator;
@@ -235,8 +236,8 @@ pub fn calculate_stoploss_input(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: 
  * calculate_risk_initial:
  * Calculates the initial risk.
  * This is the risk we will take if our stoploss is reached.
- * This should be equal to the risk_input if everything was
- * correctly calculated.
+ * This should be almost equal to the risk_input if everything was
+ * correctly calculated. Except for the tax and commission difference.
  * Note:
  * Long
  * ----
@@ -274,7 +275,6 @@ pub fn calculate_amount(a_price: f64, a_shares: i32) -> f64
  * AMT = SP + SPT + C (buy)
  * AMT = SP - SPT - C (sell)
  **********************************************************************/
-// TODO: How to create the transaction-type enum?
 pub fn calculate_amount_with_tax_and_commission(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_transaction_type: TransactionType) -> f64
 {
     let result;
