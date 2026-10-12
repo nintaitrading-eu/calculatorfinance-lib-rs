@@ -150,6 +150,42 @@ pub fn calculate_stoploss(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a
 }
 
 /**********************************************************************
+ * calculate_risk_percentage_input:
+ * Calculates the R value (risk of pool, based on the stoploss).
+ * Modified version to estimate, when the incomplete trade only has the first
+ * part of the given values.
+ * Note:
+ * For long, the values for buy are used.
+ * For short, the values for sell are used.
+ * That is what you start with.
+ * Long
+ * ----
+ * amount at buying - amount selling at stoploss  = initial risk of pool
+ * (Sb.Pb + Sb.Pb.Tb + Cb) - (Ssl.Psl - Ssl.Psl.Tsl - Csl) = R/100 * pool
+ * => Sb.Pb.(1 + Tb) + Cb - Ssl.Psl.(1 - Tsl) + Csl = R/100 * pool
+ * => R = (Sb.Pb.(1 + Tb) - Ssl.Psl.(1 - Tsl) + Cb + Csl) * 100/pool
+ * Short
+ * -----
+ * amount buying at stoploss - amount selling  = initial risk of pool
+ * (Ssl.Psl + Ssl.Psl.Tsl + Csl) - (Ss.Ps - Ss.Ps.Ts - Cs) = R/100 * pool
+ * => Ssl.Psl + Ssl.Psl.Tsl + Csl - Ss.Ps.(1 - Ts) + Cs = R/100 * pool
+ * => Ssl.Psl + Ssl.Psl.Tsl + Csl - Ss.Ps.(1 - Ts) + Cs = R/100 * pool
+ * => Ssl.Psl.(1 + Tsl) + Csl - Ss.Ps (1 - Ts) + Cs = R/100 * pool
+ * => R = (Ssl.Psl.(1 + Tsl) - Ss.Ps.(1 - Ts) + Csl + Cs) * 100/pool
+ **********************************************************************/
+pub fn calculate_risk_percentage_input(a_price_buy: f64, a_shares_buy: i32, a_commission_buy: f64, a_tax_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_stoploss: f64, a_pool: f64, a_trade_type: TradeType) -> f64
+{
+    if a_trade_type == TradeType::Long
+    {
+        ((a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0) - (a_shares_buy as f64) * a_stoploss * (1.0 - a_tax_buy / 100.0) + a_commission_buy + a_commission_buy) * 100.0/a_pool
+    }
+    else
+    {
+        ((a_shares_sell as f64) * a_stoploss * (1.0 + a_tax_sell / 100.0) - (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) + a_commission_sell + a_commission_sell) * 100.0/a_pool
+    }
+}
+
+/**********************************************************************
  * calculate_risk_percentage:
  * Calculates the R value (risk of pool, based on the stoploss).
  * Note:

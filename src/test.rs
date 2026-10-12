@@ -64,6 +64,13 @@ fn risk_percentage_accounts_for_tax_and_commission_on_both_trade_types()
 }
 
 #[test]
+fn risk_percentage_accounts_for_tax_and_commission_on_both_trade_types_for_input()
+{
+    assert_close(calculate_risk_percentage_input(100.0, 10, 5.0, 1.0, 0.0, 0, 0.0, 0.0, 96.0, 1000.0, TradeType::Long), 6.960000000000002);
+    assert_close(calculate_risk_percentage_input(0.0, 0, 0.0, 0.0, 100.0, 10, 5.0, 1.0, 104.0, 1000.0, TradeType::Short), 14.4);
+}
+
+#[test]
 fn input_risk_is_a_percentage_of_the_pool()
 {
     assert_close(calculate_risk_input(1000.0, 5.0), 50.0);
