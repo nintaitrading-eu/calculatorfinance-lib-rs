@@ -483,20 +483,26 @@ pub fn calculate_profit_loss(a_price_buy: f64, a_shares_buy: i32, a_price_sell: 
  * calculate_profit_loss_total:
  * Calculates the total profit_loss.
  *
- * Note:
+ * Long
+ * ----
+ * profit_loss = Ss.Ps - Ss.Ps.Ts - Cs - (Sb.Pb + Sb.Pb.Tb + Cb)
+ * => profit_loss = Ss.Ps.(1 - Ts) - Cs - Sb.Pb - Sb.Pb.Tb - Cb
+ * => profit_loss = Ss.Ps.(1 - Ts) - Cs - Sb.Pb.(1 + Tb) - Cb
+ *
+ * Short
  * -----
- * For long trades: profit_loss = S.Ps - S.Ps.T - C - (S.Pb + S.Pb.T + C)
- * For short trades: profit_loss = S.Pb - S.Pb.T - C - (S.Ps + S.Ps.T + C)
+ * profit_loss = Sb.Pb - Sb.Pb.Tb - Cb - (Ss.Ps + Ss.Ps.Ts + Cs)
+ * => profit_loss = Sb.Pb.(1 - Tb) - Cb - Ss.Ps.(1 + Ts) - Cs
  **********************************************************************/
 pub fn calculate_profit_loss_total(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_trade_type: TradeType) -> f64
 {
     if a_trade_type == TradeType::Long
     {
-        (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) - (a_shares_buy as f64) * a_price_buy * (1.0 - a_tax_buy / 100.0) - (a_commission_buy + a_commission_sell)
+        (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) - a_commission_sell - (a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0) - a_commission_buy
     }
     else if a_trade_type == TradeType::Short
     {
-        (a_shares_buy as f64) * a_price_buy * (1.0 - a_tax_buy / 100.0) - (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) - (a_commission_sell + a_commission_buy)
+        (a_shares_buy as f64) * a_price_buy * (1.0 - a_tax_buy / 100.0) - a_commission_buy - (a_shares_sell as f64) * a_price_sell * (1.0 + a_tax_sell / 100.0) - a_commission_sell
     }
     else
     {
