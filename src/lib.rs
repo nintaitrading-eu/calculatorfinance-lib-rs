@@ -539,6 +539,41 @@ pub fn calculate_close_at_breakeven(a_price_buy: f64, a_shares_buy: i32, a_tax_b
 }
 
 /**********************************************************************
+ * calculate_close_at_preferred:
+ * Calculates the the price you should close the trade at, to end at a minimum desired profit.
+ * We put this at a profit of at least the risk we take on a trade.
+ *
+ * Long
+ * ----
+ * Ss.Ps - Ss.Ps.Ts - Cs - (Sb.Pb + Sb.Pb.Tb + Cb) = risk_initial
+ * => Ps = (Cs + Cb + Sb.Pb.(1 - Tb))/(Ss.(1 - Ts))
+ * => Sell info not known. Substitute for the buy info.
+ * => Ps = (Cb + Cb + Sb.Pb.(1 - Tb))/(Sb.(1 - Tb))
+ *
+ * Short
+ * ----
+ * Ss.Ps - Ss.Ps.Ts - Cs - (Sb.Pb + Sb.Pb.Tb + Cb) = risk_initial
+ * => Pb = (Cs + Cb - Ss.Ps.(1 - Ts))/(-Sb.(1 - Tb))
+ * => Buy info not known. Substitute for the sell info.
+ * => Pb = (Cs + Cs + Ss.Ps.(1 - Ts))/(-Ss.(1 - Ts))
+ **********************************************************************/
+pub fn calculate_close_at_preferred(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk_initial: f64, a_trade_type: TradeType) -> f64
+{
+    if a_trade_type == TradeType::Long
+    {
+        a_risk_initial + (a_commission_buy + a_commission_buy + (a_shares_buy as f64) * a_price_buy * (1.0 - a_tax_buy / 100.0)) / ((a_shares_buy as f64) * (1.0 - a_tax_buy / 100.0))
+    }
+    else if a_trade_type == TradeType::Short
+    {
+        a_risk_initial + (a_commission_sell + a_commission_sell - (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0)) / (- (a_shares_sell as f64) * (1.0 - a_tax_sell / 100.0))
+    }
+    else
+    {
+        panic!("Invalid code path in calculate_close_at_preferred.")
+    }
+}
+
+/**********************************************************************
  * calculate_cost_other:
  * Calculates other costs based on the difference that remains.
  **********************************************************************/
