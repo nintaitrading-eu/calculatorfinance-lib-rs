@@ -163,23 +163,23 @@ fn other_cost_is_the_remaining_difference_or_zero()
 #[test]
 fn calculate_close_at_breakeven_works_long()
 {
-    assert_close(calculate_close_at_breakeven(100.0, 10, 5.0, 10.0, 0.0, 0, 0.0, 0.0, TradeType::Long), 102.10526315789474);
+    assert_close(calculate_close_at_breakeven(100.0, 10, 5.0, 10.0, 0.0, 0, 0.0, 0.0, TradeType::Long), 112.63157894736842);
 }
 
 #[test]
 fn calculate_close_at_breakeven_works_short()
 {
-    assert_close(calculate_close_at_breakeven(0.0, 0, 0.0, 0.0, 100.0, 10, 5.0, 10.0, TradeType::Short), 97.89473684210526);
+    assert_close(calculate_close_at_breakeven(0.0, 0, 0.0, 0.0, 100.0, 10, 5.0, 10.0, TradeType::Short), 112.63157894736842);
 }
 
 #[test]
 fn calculate_close_at_preferred_works_long()
 {
-    assert_close(calculate_close_at_preferred(100.0, 10, 5.0, 10.0, 0.0, 0, 0.0, 0.0, 1000.0, TradeType::Long), 1102.10526315789474);
+    assert_close(calculate_close_at_preferred(100.0, 10, 5.0, 10.0, 0.0, 0, 0.0, 0.0, 1000.0, TradeType::Long), 217.89473684210526);
 }
 
 #[test]
 fn calculate_close_at_preferred_works_short()
 {
-    assert_close(calculate_close_at_preferred(0.0, 0, 0.0, 0.0, 100.0, 10, 5.0, 10.0, 1000.0, TradeType::Short), 1097.89473684210526);
+    assert_close(calculate_close_at_preferred(0.0, 0, 0.0, 0.0, 100.0, 10, 5.0, 10.0, 1000.0, TradeType::Short), 217.89473684210526);
 }

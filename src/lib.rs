@@ -511,26 +511,30 @@ pub fn calculate_profit_loss_total(a_price_buy: f64, a_shares_buy: i32, a_tax_bu
  * Long
  * ----
  * Ss.Ps - Ss.Ps.Ts - Cs - (Sb.Pb + Sb.Pb.Tb + Cb) = 0
- * => Ps = (Cs + Cb + Sb.Pb.(1 - Tb))/(Ss.(1 - Ts))
+ * => Ss.Ps - Ss.Ps.Ts - Cs - Sb.Pb - Sb.Pb.Tb - Cb = 0
+ * => Ss.Ps.(1 - Ts) = Cs + Cb + Sb.Pb.(1 + Tb) 
+ * => Ps = (Cs + Cb + Sb.Pb.(1 + Tb))/(Ss.(1 - Ts))
  * => Sell info not known. Substitute for the buy info.
- * => Ps = (Cb + Cb + Sb.Pb.(1 - Tb))/(Sb.(1 - Tb))
+ * => Ps = (Cb + Cb + Sb.Pb.(1 + Tb))/(Sb.(1 - Tb))
  *
  * Short
  * ----
  * Ss.Ps - Ss.Ps.Ts - Cs - (Sb.Pb + Sb.Pb.Tb + Cb) = 0
- * => Pb = (Cs + Cb - Ss.Ps.(1 - Ts))/(-Sb.(1 - Tb))
+ * => Ss.Ps - Ss.Ps.Ts - Cs - Sb.Pb - Sb.Pb.Tb - Cb = 0
+ * => Ss.Ps (1 - Ts) = Cs + Cb + Sb.Pb.(1 + Tb)
+ * => Pb = (Cs + Cb + Sb.Pb.(1 + Tb))/(Ss.(1 - Ts))
  * => Buy info not known. Substitute for the sell info.
- * => Pb = (Cs + Cs + Ss.Ps.(1 - Ts))/(-Ss.(1 - Ts))
+ * => Pb = (Cs + Cs + Ss.Ps.(1 + Ts))/(Ss.(1 - Ts))
  **********************************************************************/
 pub fn calculate_close_at_breakeven(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_trade_type: TradeType) -> f64
 {
     if a_trade_type == TradeType::Long
     {
-        (a_commission_buy + a_commission_buy + (a_shares_buy as f64) * a_price_buy * (1.0 - a_tax_buy / 100.0)) / ((a_shares_buy as f64) * (1.0 - a_tax_buy / 100.0))
+        (a_commission_buy + a_commission_buy + (a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0)) / ((a_shares_buy as f64) * (1.0 - a_tax_buy / 100.0))
     }
     else if a_trade_type == TradeType::Short
     {
-        (a_commission_sell + a_commission_sell - (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0)) / (- (a_shares_sell as f64) * (1.0 - a_tax_sell / 100.0))
+        (a_commission_sell + a_commission_sell + (a_shares_sell as f64) * a_price_sell * (1.0 + a_tax_sell / 100.0)) / ((a_shares_sell as f64) * (1.0 - a_tax_sell / 100.0))
     }
     else
     {
@@ -546,26 +550,30 @@ pub fn calculate_close_at_breakeven(a_price_buy: f64, a_shares_buy: i32, a_tax_b
  * Long
  * ----
  * Ss.Ps - Ss.Ps.Ts - Cs - (Sb.Pb + Sb.Pb.Tb + Cb) = risk_initial
- * => Ps = (Cs + Cb + Sb.Pb.(1 - Tb))/(Ss.(1 - Ts))
+ * => Ss.Ps - Ss.Ps.Ts - Cs - Sb.Pb - Sb.Pb.Tb - Cb = risk_initial
+ * => Ss.Ps.(1 - Ts) = Cs + Cb + risk_initial + Sb.Pb.(1 + Tb) 
+ * => Ps = (Cs + Cb + risk_initial + Sb.Pb.(1 + Tb))/(Ss.(1 - Ts))
  * => Sell info not known. Substitute for the buy info.
- * => Ps = (Cb + Cb + Sb.Pb.(1 - Tb))/(Sb.(1 - Tb))
+ * => Ps = (Cb + Cb + risk_initial + Sb.Pb.(1 + Tb))/(Sb.(1 - Tb))
  *
  * Short
  * ----
  * Ss.Ps - Ss.Ps.Ts - Cs - (Sb.Pb + Sb.Pb.Tb + Cb) = risk_initial
- * => Pb = (Cs + Cb - Ss.Ps.(1 - Ts))/(-Sb.(1 - Tb))
+ * => Ss.Ps - Ss.Ps.Ts - Cs - Sb.Pb - Sb.Pb.Tb - Cb = risk_initial
+ * => Ss.Ps (1 - Ts) = Cs + Cb + risk_initial + Sb.Pb.(1 + Tb)
+ * => Pb = (Cs + Cb + risk_initial + Sb.Pb.(1 + Tb))/(Ss.(1 - Ts))
  * => Buy info not known. Substitute for the sell info.
- * => Pb = (Cs + Cs + Ss.Ps.(1 - Ts))/(-Ss.(1 - Ts))
+ * => Pb = (Cs + Cs + risk_initial + Ss.Ps.(1 + Ts))/(Ss.(1 - Ts))
  **********************************************************************/
 pub fn calculate_close_at_preferred(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk_initial: f64, a_trade_type: TradeType) -> f64
 {
     if a_trade_type == TradeType::Long
     {
-        a_risk_initial + (a_commission_buy + a_commission_buy + (a_shares_buy as f64) * a_price_buy * (1.0 - a_tax_buy / 100.0)) / ((a_shares_buy as f64) * (1.0 - a_tax_buy / 100.0))
+        (a_commission_buy + a_commission_buy + a_risk_initial + (a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0)) / ((a_shares_buy as f64) * (1.0 - a_tax_buy / 100.0))
     }
     else if a_trade_type == TradeType::Short
     {
-        a_risk_initial + (a_commission_sell + a_commission_sell - (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0)) / (- (a_shares_sell as f64) * (1.0 - a_tax_sell / 100.0))
+        (a_commission_sell + a_commission_sell + a_risk_initial + (a_shares_sell as f64) * a_price_sell * (1.0 + a_tax_sell / 100.0)) / ((a_shares_sell as f64) * (1.0 - a_tax_sell / 100.0))
     }
     else
     {
