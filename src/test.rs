@@ -159,3 +159,15 @@ fn other_cost_is_the_remaining_difference_or_zero()
     assert_close(calculate_cost_other(200.0, 180.0, 15.0), 5.0);
     assert_close(calculate_cost_other(200.0, 180.0, 20.0), 0.0);
 }
+
+#[test]
+fn calculate_close_at_breakeven_works_long()
+{
+    assert_close(calculate_close_at_breakeven(100.0, 10, 5.0, 10.0, 0.0, 0, 0.0, 0.0, TradeType::Long), 102.10526315789474);
+}
+
+#[test]
+fn calculate_close_at_breakeven_works_short()
+{
+    assert_close(calculate_close_at_breakeven(0.0, 0, 0.0, 0.0, 100.0, 10, 5.0, 10.0, TradeType::Short), 97.89473684210526);
+}
