@@ -154,6 +154,20 @@ fn total_profit_loss_deducts_commissions()
 }
 
 #[test]
+fn calculate_profit_loss_long_works()
+{
+    assert_close(calculate_profit_loss(100.0, 10, 120.0, 10, TradeType::Long), 200.0);
+    assert_close(calculate_profit_loss(120.0, 10, 100.0, 10, TradeType::Long), -200.0);
+}
+
+#[test]
+fn calculate_profit_loss_short_works()
+{
+    assert_close(calculate_profit_loss(120.0, 10, 100.0, 10, TradeType::Short), 200.0);
+    assert_close(calculate_profit_loss(100.0, 10, 120.0, 10, TradeType::Short), -200.0);
+}
+
+#[test]
 fn calculate_profit_loss_total_long_works()
 {
     assert_close(calculate_profit_loss_total(100.0, 10, 5.0, 10.0, 120.0, 10, 5.0, 10.0, TradeType::Long), 70.0);
