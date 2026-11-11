@@ -374,7 +374,7 @@ pub fn calculate_price(a_amount: f64, a_shares: i32, a_tax: f64, a_commission: f
  * risk = S.Pb + S.Pb.T + Cb - (S.Ps - S.Ps.T - Cs)
  * Same for short and long trades.
  **********************************************************************/
-pub fn calculate_risk(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk_initial: f64, a_profit_loss: f64, a_trade_type: TradeType) -> f64
+pub fn calculate_risk(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk_initial: f64, a_profit_loss: f64) -> f64
 {
     if ((a_profit_loss < 0.0) && (a_profit_loss.abs() < a_risk_initial)) || (a_profit_loss >= 0.0)
     {
