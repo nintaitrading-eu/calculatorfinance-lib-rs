@@ -371,8 +371,8 @@ pub fn calculate_price(a_amount: f64, a_shares: i32, a_tax: f64, a_commission: f
  *
  * Note:
  * -----
- * For long trades: risk = S.Pb + S.Pb.T + Cb - (S.Ps - S.Ps.T - Cs)
- * For short trades: risk = S.Ps + S.Ps.T + Cs - (S.Pb - S.Pb.T - Cb)
+ * risk = S.Pb + S.Pb.T + Cb - (S.Ps - S.Ps.T - Cs)
+ * Same for short and long trades.
  **********************************************************************/
 pub fn calculate_risk(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk_initial: f64, a_profit_loss: f64, a_trade_type: TradeType) -> f64
 {
@@ -380,17 +380,9 @@ pub fn calculate_risk(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_com
     {
         a_risk_initial
     }
-    else if a_trade_type == TradeType::Long
-    {
-        (a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0) - (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) + a_commission_buy + a_commission_sell
-    }
-    else if a_trade_type == TradeType::Short
-    {
-        (a_shares_sell as f64) * a_price_sell * (1.0 + a_tax_sell / 100.0) - (a_shares_buy as f64) * a_price_buy * (1.0 - a_tax_buy / 100.0) + a_commission_sell + a_commission_buy
-    }
     else
     {
-        panic!("Invalid code path in calculate_risk.")
+        (a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0) - (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) + a_commission_buy + a_commission_sell
     }
 }
 
