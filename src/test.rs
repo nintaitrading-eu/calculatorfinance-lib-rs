@@ -144,39 +144,27 @@ fn total_cost_includes_both_sides_of_the_trade()
 #[test]
 fn profit_loss_uses_buy_and_sell_amounts()
 {
-    assert_close(calculate_profit_loss(100.0, 10, 120.0, 10, TradeType::Long), 200.0);
+    assert_close(calculate_profit_loss(100.0, 10, 120.0, 10), 200.0);
 }
 
 #[test]
 fn total_profit_loss_deducts_commissions()
 {
-    assert_close(calculate_profit_loss_total(100.0, 10, 0.0, 5.0, 120.0, 10, 0.0, 7.0, TradeType::Long), 188.0);
+    assert_close(calculate_profit_loss_total(100.0, 10, 0.0, 5.0, 120.0, 10, 0.0, 7.0), 188.0);
 }
 
 #[test]
-fn calculate_profit_loss_long_works()
+fn calculate_profit_loss_works()
 {
-    assert_close(calculate_profit_loss(100.0, 10, 120.0, 10, TradeType::Long), 200.0);
-    assert_close(calculate_profit_loss(120.0, 10, 100.0, 10, TradeType::Long), -200.0);
+    assert_close(calculate_profit_loss(100.0, 10, 120.0, 10), 200.0);
+    assert_close(calculate_profit_loss(120.0, 10, 100.0, 10), -200.0);
 }
 
 #[test]
-fn calculate_profit_loss_short_works()
+fn calculate_profit_loss_total_works()
 {
-    assert_close(calculate_profit_loss(120.0, 10, 100.0, 10, TradeType::Short), 200.0);
-    assert_close(calculate_profit_loss(100.0, 10, 120.0, 10, TradeType::Short), -200.0);
-}
-
-#[test]
-fn calculate_profit_loss_total_long_works()
-{
-    assert_close(calculate_profit_loss_total(100.0, 10, 5.0, 10.0, 120.0, 10, 5.0, 10.0, TradeType::Long), 70.0);
-}
-
-#[test]
-fn calculate_profit_loss_total_short_works()
-{
-    assert_close(calculate_profit_loss_total(120.0, 10, 5.0, 10.0, 100.0, 10, 5.0, 10.0, TradeType::Short), 70.0);
+    assert_close(calculate_profit_loss_total(100.0, 10, 5.0, 10.0, 120.0, 10, 5.0, 10.0), 70.0);
+    assert_close(calculate_profit_loss_total(120.0, 10, 5.0, 10.0, 100.0, 10, 5.0, 10.0), -330.0);
 }
 
 #[test]

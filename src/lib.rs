@@ -461,53 +461,28 @@ pub fn calculate_cost_total(a_amount_buy: f64, a_tax_buy: f64, a_commission_buy:
  * Note:
  * -----
  * For long trades: profit_loss = S.Ps - S.Pb
- * For short trades: profit_loss = S.Pb - S.Ps
+ * Same for short and long.
  **********************************************************************/
-pub fn calculate_profit_loss(a_price_buy: f64, a_shares_buy: i32, a_price_sell: f64, a_shares_sell: i32, a_trade_type: TradeType) -> f64
+pub fn calculate_profit_loss(a_price_buy: f64, a_shares_buy: i32, a_price_sell: f64, a_shares_sell: i32) -> f64
 {
-    if a_trade_type == TradeType::Long
-    {
-        (a_shares_sell as f64) * a_price_sell - (a_shares_buy as f64) * a_price_buy
-    }
-    else if a_trade_type == TradeType::Short
-    {
-        (a_shares_buy as f64) * a_price_buy - (a_shares_sell as f64) * a_price_sell
-    }
-    else
-    {
-        panic!("Invalid code path in calculate_profit_loss.")
-    }
+    (a_shares_sell as f64) * a_price_sell - (a_shares_buy as f64) * a_price_buy
 }
 
 /**********************************************************************
  * calculate_profit_loss_total:
  * Calculates the total profit_loss.
  *
- * Long
- * ----
+ * Note:
+ * -----
  * profit_loss = Ss.Ps - Ss.Ps.Ts - Cs - (Sb.Pb + Sb.Pb.Tb + Cb)
  * => profit_loss = Ss.Ps.(1 - Ts) - Cs - Sb.Pb - Sb.Pb.Tb - Cb
  * => profit_loss = Ss.Ps.(1 - Ts) - Cs - Sb.Pb.(1 + Tb) - Cb
  *
- * Short
- * -----
- * profit_loss = Sb.Pb - Sb.Pb.Tb - Cb - (Ss.Ps + Ss.Ps.Ts + Cs)
- * => profit_loss = Sb.Pb.(1 - Tb) - Cb - Ss.Ps.(1 + Ts) - Cs
+ * Same for short and long.
  **********************************************************************/
-pub fn calculate_profit_loss_total(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_trade_type: TradeType) -> f64
+pub fn calculate_profit_loss_total(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64) -> f64
 {
-    if a_trade_type == TradeType::Long
-    {
-        (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) - a_commission_sell - (a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0) - a_commission_buy
-    }
-    else if a_trade_type == TradeType::Short
-    {
-        (a_shares_buy as f64) * a_price_buy * (1.0 - a_tax_buy / 100.0) - a_commission_buy - (a_shares_sell as f64) * a_price_sell * (1.0 + a_tax_sell / 100.0) - a_commission_sell
-    }
-    else
-    {
-        panic!("Invalid code path in calculate_profit_loss_total.")
-    }
+    (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) - a_commission_sell - (a_shares_buy as f64) * a_price_buy * (1.0 + a_tax_buy / 100.0) - a_commission_buy
 }
 
 /**********************************************************************
