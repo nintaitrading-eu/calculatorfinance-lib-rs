@@ -53,7 +53,18 @@ fn stoploss_for_long_positions()
 #[test]
 fn stoploss_for_short_positions()
 {
-    assert_close(calculate_stoploss(100.0, 10, 0.0, 5.0, 100.0, 10, 0.0, 5.0, 2.0, 1000.0, TradeType::Short), 103.0);
+    assert_close(calculate_stoploss(100.0, 10, 0.0, 5.0, 100.0, 10, 0.0, 5.0, 2.0, 1000.0, TradeType::Short), 101.0);
+    let stoploss = calculate_stoploss(100.0, 10, 1.0, 5.0, 100.0, 10, 2.0, 7.0, 8.24, 1000.0, TradeType::Short);
+    assert_close(stoploss, 104.0);
+    assert_close(calculate_risk_percentage(100.0, 10, 1.0, 5.0, 100.0, 10, 2.0, 7.0, stoploss, 1000.0, TradeType::Short), 8.24);
+}
+
+#[test]
+fn initial_stoploss_for_short_positions()
+{
+    let stoploss = calculate_stoploss_initial(0.0, 0, 0.0, 0.0, 100.0, 10, 5.0, 1.0, 14.4, 1000.0, TradeType::Short);
+    assert_close(stoploss, 104.0);
+    assert_close(calculate_risk_initial(0.0, 0, 0.0, 0.0, 100.0, 10, 5.0, 1.0, stoploss, TradeType::Short), 144.0);
 }
 
 #[test]
@@ -92,8 +103,8 @@ fn amount_is_price_times_shares()
 #[test]
 fn amount_with_tax_and_commission_for_buy_and_sell()
 {
-    assert_close(calculate_amount_with_tax_and_commission(20.0, 5, 0.02, 3.0, TransactionType::Buy), 105.0);
-    assert_close(calculate_amount_with_tax_and_commission(20.0, 5, 0.02, 3.0, TransactionType::Sell), 95.0);
+    assert_close(calculate_amount_with_tax_and_commission(20.0, 5, 2.0, 3.0, TransactionType::Buy), 105.0);
+    assert_close(calculate_amount_with_tax_and_commission(20.0, 5, 2.0, 3.0, TransactionType::Sell), 95.0);
 }
 
 #[test]
@@ -183,7 +194,9 @@ fn calculate_close_at_breakeven_works_long()
 #[test]
 fn calculate_close_at_breakeven_works_short()
 {
-    assert_close(calculate_close_at_breakeven(0.0, 0, 0.0, 0.0, 100.0, 10, 5.0, 10.0, TradeType::Short), 112.63157894736842);
+    let price = calculate_close_at_breakeven(0.0, 0, 0.0, 0.0, 100.0, 10, 5.0, 10.0, TradeType::Short);
+    assert_close(price, 88.57142857142857);
+    assert_close(calculate_profit_loss_total(price, 10, 5.0, 10.0, 100.0, 10, 5.0, 10.0), 0.0);
 }
 
 #[test]
@@ -195,5 +208,7 @@ fn calculate_close_at_preferred_works_long()
 #[test]
 fn calculate_close_at_preferred_works_short()
 {
-    assert_close(calculate_close_at_preferred(0.0, 0, 0.0, 0.0, 100.0, 10, 5.0, 10.0, 1000.0, TradeType::Short), 217.89473684210526);
+    let price = calculate_close_at_preferred(0.0, 0, 0.0, 0.0, 100.0, 10, 5.0, 10.0, 100.0, TradeType::Short);
+    assert_close(price, 79.04761904761905);
+    assert_close(calculate_profit_loss_total(price, 10, 5.0, 10.0, 100.0, 10, 5.0, 10.0), 100.0);
 }

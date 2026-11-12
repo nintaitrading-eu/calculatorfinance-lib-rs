@@ -219,9 +219,9 @@ pub fn calculate_risk_input(a_pool: f64, a_risk: f64) -> f64
  * amount buying at stoploss - amount selling  = initial risk of pool
  * (Ssl.Psl + Ssl.Psl.Tsl + Csl) - (Ss.Ps - Ss.Ps.Ts - Cs) = R/100 * pool
  * => Ssl.Psl + Ssl.Psl.Tsl + Csl - Ss.Ps + Ss.Ps.Ts + Cs = R/100 * pool
- * => Psl.Ssl.(1 + Tsl) + Csl - Ss.Ps (1 + Ts) + Cs = R/100 * pool
- * => Psl.Ssl.(1 + Tsl) = R/100 * pool - Csl + Ss.Ps.(1 + Ts) - Cs
- * => Psl = (R/100 * pool + Ss.Ps.(1 + Ts) - Csl - Cs) / Ssl.(1 + Tsl)
+ * => Psl.Ssl.(1 + Tsl) + Csl - Ss.Ps (1 - Ts) + Cs = R/100 * pool
+ * => Psl.Ssl.(1 + Tsl) = R/100 * pool - Csl + Ss.Ps.(1 - Ts) - Cs
+ * => Psl = (R/100 * pool + Ss.Ps.(1 - Ts) - Csl - Cs) / Ssl.(1 + Tsl)
  *
  * It takes the tax at sell and commission at sell.
  * The real value will be a little different, because of that, but we
@@ -240,7 +240,7 @@ pub fn calculate_stoploss_initial(a_price_buy: f64, a_shares_buy: i32, a_tax_buy
     }
     else
     {
-        l_numerator = a_risk / 100.0 * a_pool + (a_shares_sell as f64) * a_price_sell * (1.0 + a_tax_sell / 100.0) - a_commission_sell - a_commission_sell;
+        l_numerator = a_risk / 100.0 * a_pool + (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) - a_commission_sell - a_commission_sell;
         l_denominator = (a_shares_sell as f64) * (1.0 + a_tax_sell / 100.0);
     }
     l_numerator / l_denominator
@@ -263,7 +263,7 @@ pub fn calculate_stoploss_initial(a_price_buy: f64, a_shares_buy: i32, a_tax_buy
  *
  * Short
  * -----
- * S.Ps + S.Psl.T + C - (S.Ps - S.Ps.T - C)
+ * S.Psl + S.Psl.T + C - (S.Ps - S.Ps.T - C)
  *
  * It takes the tax at sell and commission at sell.
  * The real value will be a little different, because of that, but we
@@ -306,11 +306,11 @@ pub fn calculate_amount_with_tax_and_commission(a_price: f64, a_shares: i32, a_t
     let result;
     if a_transaction_type == TransactionType::Buy
     {
-        result = (a_shares as f64) * a_price + (a_shares as f64) * a_price * a_tax + a_commission;
+        result = (a_shares as f64) * a_price + (a_shares as f64) * a_price * a_tax / 100.0 + a_commission;
     }
     else
     {
-        result = (a_shares as f64) * a_price - (a_shares as f64) * a_price * a_tax - a_commission;
+        result = (a_shares as f64) * a_price - (a_shares as f64) * a_price * a_tax / 100.0 - a_commission;
     }
     result
 }
@@ -403,11 +403,11 @@ pub fn calculate_risk(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_com
  * Short
  * -----
  * amount buying at stoploss - amount selling  = initial risk of pool
- * (Ssl.Psl - Ssl.Psl.Tsl - Csl) - (Ss.Ps + Ss.Ps.Ts + Cs) = R/100 * pool
- * => Ssl.Psl - Ssl.Psl.Tsl - Csl - Ss.Ps - Ss.Ps.Ts - Cs = R/100 * pool
- * => Psl.Ssl.(1 - Tsl) - Csl - Ss.Ps (1 - Ts) - Cs = R/100 * pool
- * => Psl.Ssl.(1 - Tsl) = R/100 * pool + Csl + Ss.Ps.(1 - Ts) + Cs
- * => Psl = (R/100 * pool + Ss.Ps.(1 - Ts) + Csl + Cs) / Ssl.(1 - Tsl)
+ * (Ssl.Psl + Ssl.Psl.Tsl + Csl) - (Ss.Ps - Ss.Ps.Ts - Cs) = R/100 * pool
+ * => Ssl.Psl + Ssl.Psl.Tsl + Csl - Ss.Ps + Ss.Ps.Ts + Cs = R/100 * pool
+ * => Psl.Ssl.(1 + Tsl) + Csl - Ss.Ps (1 - Ts) + Cs = R/100 * pool
+ * => Psl.Ssl.(1 + Tsl) = R/100 * pool - Csl + Ss.Ps.(1 - Ts) - Cs
+ * => Psl = (R/100 * pool + Ss.Ps.(1 - Ts) - Csl - Cs) / Ssl.(1 + Tsl)
  *
  * => Long: sl = sell, Short: sl = buy
  **********************************************************************/
@@ -422,8 +422,8 @@ pub fn calculate_stoploss(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a
     }
     else
     {
-        l_numerator = a_risk / 100.0 * a_pool + (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) + a_commission_buy + a_commission_sell;
-        l_denominator = (a_shares_buy as f64) * (1.0 - a_tax_buy / 100.0);
+        l_numerator = a_risk / 100.0 * a_pool + (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) - a_commission_buy - a_commission_sell;
+        l_denominator = (a_shares_buy as f64) * (1.0 + a_tax_buy / 100.0);
     }
     l_numerator / l_denominator
 }
@@ -494,10 +494,10 @@ pub fn calculate_profit_loss_total(a_price_buy: f64, a_shares_buy: i32, a_tax_bu
  * ----
  * Ss.Ps - Ss.Ps.Ts - Cs - (Sb.Pb + Sb.Pb.Tb + Cb) = 0
  * => Ss.Ps - Ss.Ps.Ts - Cs - Sb.Pb - Sb.Pb.Tb - Cb = 0
- * => Ss.Ps (1 - Ts) = Cs + Cb + Sb.Pb.(1 + Tb)
- * => Pb = (Cs + Cb + Sb.Pb.(1 + Tb))/(Ss.(1 - Ts))
+ * => Sb.Pb.(1 + Tb) = Ss.Ps.(1 - Ts) - Cs - Cb
+ * => Pb = (Ss.Ps.(1 - Ts) - Cs - Cb)/(Sb.(1 + Tb))
  * => Buy info not known. Substitute for the sell info.
- * => Pb = (Cs + Cs + Ss.Ps.(1 + Ts))/(Ss.(1 - Ts))
+ * => Pb = (Ss.Ps.(1 - Ts) - Cs - Cs)/(Ss.(1 + Ts))
  **********************************************************************/
 pub fn calculate_close_at_breakeven(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_trade_type: TradeType) -> f64
 {
@@ -507,7 +507,7 @@ pub fn calculate_close_at_breakeven(a_price_buy: f64, a_shares_buy: i32, a_tax_b
     }
     else if a_trade_type == TradeType::Short
     {
-        (a_commission_sell + a_commission_sell + (a_shares_sell as f64) * a_price_sell * (1.0 + a_tax_sell / 100.0)) / ((a_shares_sell as f64) * (1.0 - a_tax_sell / 100.0))
+        ((a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) - a_commission_sell - a_commission_sell) / ((a_shares_sell as f64) * (1.0 + a_tax_sell / 100.0))
     }
     else
     {
@@ -533,10 +533,10 @@ pub fn calculate_close_at_breakeven(a_price_buy: f64, a_shares_buy: i32, a_tax_b
  * ----
  * Ss.Ps - Ss.Ps.Ts - Cs - (Sb.Pb + Sb.Pb.Tb + Cb) = risk_initial
  * => Ss.Ps - Ss.Ps.Ts - Cs - Sb.Pb - Sb.Pb.Tb - Cb = risk_initial
- * => Ss.Ps (1 - Ts) = Cs + Cb + risk_initial + Sb.Pb.(1 + Tb)
- * => Pb = (Cs + Cb + risk_initial + Sb.Pb.(1 + Tb))/(Ss.(1 - Ts))
+ * => Sb.Pb.(1 + Tb) = Ss.Ps.(1 - Ts) - Cs - Cb - risk_initial
+ * => Pb = (Ss.Ps.(1 - Ts) - Cs - Cb - risk_initial)/(Sb.(1 + Tb))
  * => Buy info not known. Substitute for the sell info.
- * => Pb = (Cs + Cs + risk_initial + Ss.Ps.(1 + Ts))/(Ss.(1 - Ts))
+ * => Pb = (Ss.Ps.(1 - Ts) - Cs - Cs - risk_initial)/(Ss.(1 + Ts))
  **********************************************************************/
 pub fn calculate_close_at_preferred(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk_initial: f64, a_trade_type: TradeType) -> f64
 {
@@ -546,7 +546,7 @@ pub fn calculate_close_at_preferred(a_price_buy: f64, a_shares_buy: i32, a_tax_b
     }
     else if a_trade_type == TradeType::Short
     {
-        (a_commission_sell + a_commission_sell + a_risk_initial + (a_shares_sell as f64) * a_price_sell * (1.0 + a_tax_sell / 100.0)) / ((a_shares_sell as f64) * (1.0 - a_tax_sell / 100.0))
+        ((a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) - a_commission_sell - a_commission_sell - a_risk_initial) / ((a_shares_sell as f64) * (1.0 + a_tax_sell / 100.0))
     }
     else
     {
