@@ -53,7 +53,7 @@ fn stoploss_for_long_positions()
 #[test]
 fn stoploss_for_short_positions()
 {
-    assert_close(calculate_stoploss(100.0, 10, 0.0, 5.0, 100.0, 10, 0.0, 5.0, 2.0, 1000.0, TradeType::Short), 101.0);
+    assert_close(calculate_stoploss(100.0, 10, 0.0, 5.0, 100.0, 10, 0.0, 5.0, 2.0, 1000.0, TradeType::Short), 103.0);
 }
 
 #[test]

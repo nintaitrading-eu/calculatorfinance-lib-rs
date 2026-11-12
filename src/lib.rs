@@ -403,11 +403,11 @@ pub fn calculate_risk(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_com
  * Short
  * -----
  * amount buying at stoploss - amount selling  = initial risk of pool
- * (Ssl.Psl + Ssl.Psl.Tsl + Csl) - (Ss.Ps - Ss.Ps.Ts - Cs) = R/100 * pool
- * => Ssl.Psl + Ssl.Psl.Tsl + Csl - Ss.Ps + Ss.Ps.Ts + Cs = R/100 * pool
- * => Psl.Ssl.(1 + Tsl) + Csl - Ss.Ps (1 + Ts) + Cs = R/100 * pool
- * => Psl.Ssl.(1 + Tsl) = R/100 * pool - Csl + Ss.Ps.(1 + Ts) - Cs
- * => Psl = (R/100 * pool + Ss.Ps.(1 + Ts) - Csl - Cs) / Ssl.(1 + Tsl)
+ * (Ssl.Psl - Ssl.Psl.Tsl - Csl) - (Ss.Ps + Ss.Ps.Ts + Cs) = R/100 * pool
+ * => Ssl.Psl - Ssl.Psl.Tsl - Csl - Ss.Ps - Ss.Ps.Ts - Cs = R/100 * pool
+ * => Psl.Ssl.(1 - Tsl) - Csl - Ss.Ps (1 - Ts) - Cs = R/100 * pool
+ * => Psl.Ssl.(1 - Tsl) = R/100 * pool + Csl + Ss.Ps.(1 - Ts) + Cs
+ * => Psl = (R/100 * pool + Ss.Ps.(1 - Ts) + Csl + Cs) / Ssl.(1 - Tsl)
  *
  * => Long: sl = sell, Short: sl = buy
  **********************************************************************/
@@ -422,8 +422,8 @@ pub fn calculate_stoploss(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a
     }
     else
     {
-        l_numerator = a_risk / 100.0 * a_pool + (a_shares_sell as f64) * a_price_sell * (1.0 + a_tax_sell / 100.0) - a_commission_buy - a_commission_sell;
-        l_denominator = (a_shares_buy as f64) * (1.0 + a_tax_buy / 100.0);
+        l_numerator = a_risk / 100.0 * a_pool + (a_shares_sell as f64) * a_price_sell * (1.0 - a_tax_sell / 100.0) + a_commission_buy + a_commission_sell;
+        l_denominator = (a_shares_buy as f64) * (1.0 - a_tax_buy / 100.0);
     }
     l_numerator / l_denominator
 }
