@@ -212,3 +212,40 @@ fn calculate_close_at_preferred_works_short()
     assert_close(price, 79.04761904761905);
     assert_close(calculate_profit_loss_total(price, 10, 5.0, 10.0, 100.0, 10, 5.0, 10.0), 100.0);
 }
+
+#[test]
+fn contract_factor_scales_amounts_costs_and_profit()
+{
+    let factor = 5.0; // MES: USD 5 per index point per contract
+    assert_eq!(calculate_shares_recommended_with_factor(100000.0, 0.0, 0.0, 5000.0, factor), 4);
+    assert_close(calculate_amount_with_factor(5000.0, 2, factor), 50000.0);
+    assert_close(calculate_amount_with_tax_and_commission_with_factor(5000.0, 2, 1.0, 2.0, TransactionType::Buy, factor), 50502.0);
+    assert_close(calculate_amount_with_tax_and_commission_with_factor(5010.0, 2, 1.0, 2.0, TransactionType::Sell, factor), 49597.0);
+    assert_close(cost_transaction_with_factor(5000.0, 2, 1.0, 2.0, factor), 502.0);
+    assert_close(cost_tax_with_factor(50502.0, 2.0, 2, 5000.0, TransactionType::Buy, factor), 500.0);
+    assert_close(cost_tax_with_factor(49597.0, 2.0, 2, 5010.0, TransactionType::Sell, factor), 501.0);
+    assert_close(calculate_price_with_factor(50502.0, 2, 1.0, 2.0, TransactionType::Buy, factor), 5000.0);
+    assert_close(calculate_price_with_factor(49597.0, 2, 1.0, 2.0, TransactionType::Sell, factor), 5010.0);
+    assert_close(calculate_profit_loss_with_factor(5000.0, 2, 5010.0, 2, factor), 100.0);
+    assert_close(calculate_profit_loss_total_with_factor(5000.0, 2, 0.0, 2.0, 5010.0, 2, 0.0, 2.0, factor), 96.0);
+}
+
+#[test]
+fn contract_factor_scales_risk_and_returns_index_prices()
+{
+    let factor = 5.0;
+    let long_stop = calculate_stoploss_with_factor(5000.0, 2, 0.0, 2.0, 5000.0, 2, 0.0, 2.0, 1.0, 10000.0, TradeType::Long, factor);
+    let short_stop = calculate_stoploss_with_factor(5000.0, 2, 0.0, 2.0, 5000.0, 2, 0.0, 2.0, 1.0, 10000.0, TradeType::Short, factor);
+    assert_close(long_stop, 4990.4);
+    assert_close(short_stop, 5009.6);
+    assert_close(calculate_stoploss_initial_with_factor(5000.0, 2, 0.0, 2.0, 0.0, 0, 0.0, 0.0, 1.0, 10000.0, TradeType::Long, factor), long_stop);
+    assert_close(calculate_stoploss_initial_with_factor(0.0, 0, 0.0, 0.0, 5000.0, 2, 0.0, 2.0, 1.0, 10000.0, TradeType::Short, factor), short_stop);
+    assert_close(calculate_risk_initial_with_factor(5000.0, 2, 0.0, 2.0, 0.0, 0, 0.0, 0.0, long_stop, TradeType::Long, factor), 100.0);
+    assert_close(calculate_risk_percentage_initial_with_factor(5000.0, 2, 0.0, 2.0, 0.0, 0, 0.0, 0.0, long_stop, 10000.0, TradeType::Long, factor), 1.0);
+    assert_close(calculate_risk_percentage_with_factor(5000.0, 2, 0.0, 2.0, 5000.0, 2, 0.0, 2.0, short_stop, 10000.0, TradeType::Short, factor), 1.0);
+    assert_close(calculate_risk_with_factor(5000.0, 2, 0.0, 2.0, 4990.0, 2, 0.0, 2.0, 50.0, -104.0, factor), 104.0);
+    assert_close(calculate_close_at_breakeven_with_factor(5000.0, 2, 0.0, 2.0, 0.0, 0, 0.0, 0.0, TradeType::Long, factor), 5000.4);
+    assert_close(calculate_close_at_preferred_with_factor(5000.0, 2, 0.0, 2.0, 0.0, 0, 0.0, 0.0, 100.0, TradeType::Long, factor), 5010.4);
+    assert_close(calculate_close_at_breakeven_with_factor(0.0, 0, 0.0, 0.0, 5000.0, 2, 0.0, 2.0, TradeType::Short, factor), 4999.6);
+    assert_close(calculate_close_at_preferred_with_factor(0.0, 0, 0.0, 0.0, 5000.0, 2, 0.0, 2.0, 100.0, TradeType::Short, factor), 4989.6);
+}

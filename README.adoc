@@ -4,6 +4,27 @@
 
 Shared library for financial calculations w.r.t. trading and investing.
 
+== Contract price factor
+
+Price and share calculations also have a `_with_factor` variant with an
+additional `a_factor: f64` argument. The existing functions use a factor of
+`1.0`. Use the variant when one price unit has a monetary value different from
+one currency unit. For example, MES has a value of USD 5 per index point:
+
+[source,rust]
+----
+let profit = libcalculatorfinance::calculate_profit_loss_with_factor(
+    5000.0, 2, 5010.0, 2, 5.0,
+);
+assert_eq!(profit, 100.0);
+----
+
+Pass a positive, nonzero factor in the currency used for the pool, amounts,
+commissions, and risks. Functions that return prices (such as stoploss and
+breakeven) return them in the original price units. Monetary inputs to
+`calculate_cost_total` already include the factor, so that function does not
+take it. The weighted average price likewise remains in price units.
+
 == Build status
 
 |==============================

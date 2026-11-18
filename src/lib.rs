@@ -570,3 +570,89 @@ pub fn calculate_cost_other(a_profit_loss: f64, a_profit_loss_total: f64, a_cost
       0.0
     }
 }
+
+// The existing calculation functions use a contract factor of 1.0. These
+// variants accept prices in instrument units (for example, index points) and
+// convert each price to its monetary value before applying the same formulas.
+// Functions that return a price convert the monetary result back to instrument
+// units. Amounts, commissions, risks, and profits are already monetary values.
+
+pub fn calculate_shares_recommended_with_factor(a_pool: f64, a_commission: f64, a_tax: f64, a_price: f64, a_factor: f64) -> i32
+{
+    calculate_shares_recommended(a_pool, a_commission, a_tax, a_price * a_factor)
+}
+
+pub fn calculate_risk_percentage_initial_with_factor(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_stoploss: f64, a_pool: f64, a_trade_type: TradeType, a_factor: f64) -> f64
+{
+    calculate_risk_percentage_initial(a_price_buy * a_factor, a_shares_buy, a_tax_buy, a_commission_buy, a_price_sell * a_factor, a_shares_sell, a_tax_sell, a_commission_sell, a_stoploss * a_factor, a_pool, a_trade_type)
+}
+
+pub fn calculate_risk_percentage_with_factor(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_stoploss: f64, a_pool: f64, a_trade_type: TradeType, a_factor: f64) -> f64
+{
+    calculate_risk_percentage(a_price_buy * a_factor, a_shares_buy, a_tax_buy, a_commission_buy, a_price_sell * a_factor, a_shares_sell, a_tax_sell, a_commission_sell, a_stoploss * a_factor, a_pool, a_trade_type)
+}
+
+pub fn calculate_stoploss_initial_with_factor(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk: f64, a_pool: f64, a_trade_type: TradeType, a_factor: f64) -> f64
+{
+    calculate_stoploss_initial(a_price_buy * a_factor, a_shares_buy, a_tax_buy, a_commission_buy, a_price_sell * a_factor, a_shares_sell, a_tax_sell, a_commission_sell, a_risk, a_pool, a_trade_type) / a_factor
+}
+
+pub fn calculate_risk_initial_with_factor(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_stoploss: f64, a_trade_type: TradeType, a_factor: f64) -> f64
+{
+    calculate_risk_initial(a_price_buy * a_factor, a_shares_buy, a_tax_buy, a_commission_buy, a_price_sell * a_factor, a_shares_sell, a_tax_sell, a_commission_sell, a_stoploss * a_factor, a_trade_type)
+}
+
+pub fn calculate_amount_with_factor(a_price: f64, a_shares: i32, a_factor: f64) -> f64
+{
+    calculate_amount(a_price * a_factor, a_shares)
+}
+
+pub fn calculate_amount_with_tax_and_commission_with_factor(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_transaction_type: TransactionType, a_factor: f64) -> f64
+{
+    calculate_amount_with_tax_and_commission(a_price * a_factor, a_shares, a_tax, a_commission, a_transaction_type)
+}
+
+pub fn cost_transaction_with_factor(a_price: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_factor: f64) -> f64
+{
+    cost_transaction(a_price * a_factor, a_shares, a_tax, a_commission)
+}
+
+pub fn cost_tax_with_factor(a_amount: f64, a_commission: f64, a_shares: i32, a_price: f64, a_transaction_type: TransactionType, a_factor: f64) -> f64
+{
+    cost_tax(a_amount, a_commission, a_shares, a_price * a_factor, a_transaction_type)
+}
+
+pub fn calculate_price_with_factor(a_amount: f64, a_shares: i32, a_tax: f64, a_commission: f64, a_transaction_type: TransactionType, a_factor: f64) -> f64
+{
+    calculate_price(a_amount, a_shares, a_tax, a_commission, a_transaction_type) / a_factor
+}
+
+pub fn calculate_risk_with_factor(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk_initial: f64, a_profit_loss: f64, a_factor: f64) -> f64
+{
+    calculate_risk(a_price_buy * a_factor, a_shares_buy, a_tax_buy, a_commission_buy, a_price_sell * a_factor, a_shares_sell, a_tax_sell, a_commission_sell, a_risk_initial, a_profit_loss)
+}
+
+pub fn calculate_stoploss_with_factor(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk: f64, a_pool: f64, a_trade_type: TradeType, a_factor: f64) -> f64
+{
+    calculate_stoploss(a_price_buy * a_factor, a_shares_buy, a_tax_buy, a_commission_buy, a_price_sell * a_factor, a_shares_sell, a_tax_sell, a_commission_sell, a_risk, a_pool, a_trade_type) / a_factor
+}
+
+pub fn calculate_profit_loss_with_factor(a_price_buy: f64, a_shares_buy: i32, a_price_sell: f64, a_shares_sell: i32, a_factor: f64) -> f64
+{
+    calculate_profit_loss(a_price_buy * a_factor, a_shares_buy, a_price_sell * a_factor, a_shares_sell)
+}
+
+pub fn calculate_profit_loss_total_with_factor(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_factor: f64) -> f64
+{
+    calculate_profit_loss_total(a_price_buy * a_factor, a_shares_buy, a_tax_buy, a_commission_buy, a_price_sell * a_factor, a_shares_sell, a_tax_sell, a_commission_sell)
+}
+
+pub fn calculate_close_at_breakeven_with_factor(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_trade_type: TradeType, a_factor: f64) -> f64
+{
+    calculate_close_at_breakeven(a_price_buy * a_factor, a_shares_buy, a_tax_buy, a_commission_buy, a_price_sell * a_factor, a_shares_sell, a_tax_sell, a_commission_sell, a_trade_type) / a_factor
+}
+
+pub fn calculate_close_at_preferred_with_factor(a_price_buy: f64, a_shares_buy: i32, a_tax_buy: f64, a_commission_buy: f64, a_price_sell: f64, a_shares_sell: i32, a_tax_sell: f64, a_commission_sell: f64, a_risk_initial: f64, a_trade_type: TradeType, a_factor: f64) -> f64
+{
+    calculate_close_at_preferred(a_price_buy * a_factor, a_shares_buy, a_tax_buy, a_commission_buy, a_price_sell * a_factor, a_shares_sell, a_tax_sell, a_commission_sell, a_risk_initial, a_trade_type) / a_factor
+}
